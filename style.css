@@ -1,0 +1,630 @@
+:root{
+--fundo:#F6F8FC;
+--card:#FFFFFF;
+--texto:#172033;
+--textoSuave:#697386;
+--borda:#E6EAF0;
+--primaria:#2563EB;
+--secundaria:#7C3AED;
+--sucesso:#16A34A;
+--alerta:#F59E0B;
+--erro:#EF4444;
+--sombra:0 10px 28px rgba(15,23,42,.08);
+--splashFundo:#F8FAFF;
+--splashTexto:#0F172A;
+--splashBarraFundo:rgba(15,23,42,.10);
+}
+
+body.darkMode{
+--fundo:#0B1120;
+--card:#111827;
+--texto:#F1F5F9;
+--textoSuave:#94A3B8;
+--borda:#243044;
+--primaria:#60A5FA;
+--secundaria:#A78BFA;
+--sombra:0 12px 34px rgba(0,0,0,.35);
+--splashFundo:#050B24;
+--splashTexto:#FFFFFF;
+--splashBarraFundo:rgba(255,255,255,.10);
+}
+
+*{
+box-sizing:border-box;
+}
+
+body{
+font-family:Arial,sans-serif;
+background:var(--fundo);
+margin:0;
+padding:20px;
+padding-bottom:130px;
+text-align:center;
+color:var(--texto);
+overflow-x:hidden;
+transition:.3s;
+}
+
+/* CABEÇALHO */
+
+.cabecalho{
+background:linear-gradient(135deg,#1E3A8A,#2563EB,#7C3AED);
+padding:14px 15px 18px;
+margin:-20px -20px 20px;
+border-radius:0 0 34px 34px;
+box-shadow:0 14px 32px rgba(37,99,235,.22);
+position:relative;
+overflow:hidden;
+}
+
+body.darkMode .cabecalho{
+background:linear-gradient(135deg,#0F172A,#1E293B,#334155);
+}
+
+.cabecalho::before{
+content:"";
+position:absolute;
+width:420px;
+height:420px;
+border-radius:50%;
+background:radial-gradient(circle,rgba(255,255,255,.22),rgba(255,255,255,.06),transparent 75%);
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+filter:blur(34px);
+}
+
+.cabecalho img{
+width:140px;
+max-width:80%;
+display:block;
+margin:auto;
+box-shadow:none !important;
+border-radius:0;
+background:none;
+position:relative;
+z-index:2;
+}
+
+/* TÍTULOS */
+
+h1{
+color:var(--primaria);
+margin:10px 0 24px;
+font-size:30px;
+font-weight:900;
+}
+
+h1::after{
+content:"";
+display:block;
+width:64px;
+height:5px;
+border-radius:999px;
+background:linear-gradient(90deg,var(--primaria),var(--secundaria));
+margin:12px auto 0;
+}
+
+h2{
+color:var(--texto);
+}
+
+/* BOTÕES GERAIS */
+
+button{
+width:100%;
+max-width:600px;
+padding:17px;
+margin:10px auto;
+border:1px solid var(--borda);
+border-radius:22px;
+font-size:17px;
+font-weight:800;
+background:var(--card);
+color:var(--texto);
+box-shadow:var(--sombra);
+cursor:pointer;
+transition:.2s;
+display:block;
+}
+
+button:active{
+transform:scale(.97);
+}
+
+/* CAMPOS */
+
+input,
+select,
+textarea{
+width:90%;
+max-width:420px;
+padding:17px;
+margin:10px;
+border:1px solid var(--borda);
+border-radius:20px;
+font-size:16px;
+background:var(--card);
+color:var(--texto);
+box-shadow:0 6px 16px rgba(15,23,42,.06);
+outline:none;
+}
+
+input::placeholder,
+textarea::placeholder{
+color:var(--textoSuave);
+}
+
+/* CARDS */
+
+.card,
+body > div:not(.splashTela):not(.bottomBar):not(.cabecalho):not(.homeGrid),
+#listaTurmas > div,
+#listaAlunosTurma > div,
+#areaResumo > div{
+background:var(--card);
+color:var(--texto);
+padding:20px;
+border-radius:24px;
+border:1px solid var(--borda);
+box-shadow:var(--sombra);
+margin-bottom:14px;
+}
+
+p{
+color:var(--textoSuave);
+line-height:1.5;
+}
+
+ul{
+padding:0;
+}
+
+li{
+list-style:none;
+background:var(--card);
+color:var(--texto);
+padding:16px;
+margin:10px;
+border-radius:20px;
+border:1px solid var(--borda);
+box-shadow:var(--sombra);
+}
+
+img{
+max-width:100%;
+}
+
+/* HOME */
+
+.homeGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+margin-top:18px;
+}
+
+.painelHome{
+grid-column:span 2;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+}
+
+.cardPainel{
+background:var(--card);
+border:1px solid var(--borda);
+border-radius:22px;
+padding:16px 8px;
+box-shadow:var(--sombra);
+cursor:pointer;
+}
+
+.iconePainel{
+font-size:20px;
+display:block;
+margin-bottom:4px;
+}
+
+.painelHome strong{
+font-size:32px;
+font-weight:900;
+color:var(--primaria);
+display:block;
+}
+
+.painelHome small{
+color:var(--textoSuave);
+font-size:12px;
+}
+
+.cardBoasVindas{
+grid-column:span 2;
+background:var(--card);
+border:1px solid var(--borda);
+border-left:6px solid var(--primaria);
+border-radius:24px;
+padding:16px;
+box-shadow:var(--sombra);
+text-align:left;
+cursor:pointer;
+}
+
+.cardBoasVindas h3{
+margin:0 0 14px;
+font-size:20px;
+margin-bottom:10px;
+}
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.cardBoasVindas p{
+margin:7px 0;
+font-size:15px;
+line-height:1.35;
+}
+
+.setaCard{
+font-size:26px;
+color:var(--textoSuave);
+}
+
+/* BOTÕES DA HOME LIMPOS */
+
+.homeGrid button{
+margin:0;
+min-height:95px;
+background:var(--card) !important;
+color:var(--texto) !important;
+border:1px solid var(--borda) !important;
+box-shadow:var(--sombra);
+border-radius:24px;
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+justify-content:center;
+text-align:left;
+gap:8px;
+padding:16px;
+overflow:hidden;
+}
+
+.homeGrid button:nth-of-type(1){
+grid-column:span 2;
+min-height:140px;
+background:linear-gradient(
+135deg,
+#2563EB,
+#4F46E5,
+#7C3AED
+) !important;
+color:white !important;
+border:none !important;
+box-shadow:
+0 20px 40px rgba(79,70,229,.35);
+}
+
+.homeGrid button:nth-of-type(1) small{
+color:rgba(255,255,255,.85) !important;
+}
+
+..iconeHome{
+font-size:32px;
+color:#60A5FA;
+}
+width:54px;
+height:54px;
+border-radius:16px;
+background:rgba(37,99,235,.10);
+display:flex;
+align-items:center;
+justify-content:center;
+margin-bottom:6px;
+}
+
+body.darkMode .iconeHome{
+background:rgba(96,165,250,.14);
+}
+
+.homeGrid button span:not(.iconeHome){
+font-size:18px;
+font-weight:800;
+}
+
+.homeGrid button small{
+font-size:13px;
+color:var(--textoSuave) !important;
+line-height:1.35;
+}
+
+/* BARRA INFERIOR */
+
+.bottomBar{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+background:rgba(255,255,255,.94);
+backdrop-filter:blur(16px);
+color:var(--texto);
+display:flex;
+justify-content:space-around;
+padding:12px 8px 16px;
+border-top:1px solid var(--borda);
+box-shadow:0 -8px 24px rgba(15,23,42,.12);
+z-index:999;
+border-radius:24px 24px 0 0;
+}
+
+body.darkMode .bottomBar{
+background:rgba(15,23,42,.94);
+}
+
+.bottomItem{
+display:flex;
+flex-direction:column;
+align-items:center;
+font-size:13px;
+font-weight:800;
+cursor:pointer;
+opacity:.72;
+position:relative;
+transition:.2s;
+}
+
+.bottomIcon{
+font-size:25px;
+margin-bottom:4px;
+}
+
+.bottomItem.ativo{
+color:var(--primaria);
+opacity:1;
+}
+
+.bottomItem.ativo::before{
+content:"";
+position:absolute;
+top:-12px;
+width:52px;
+height:5px;
+border-radius:999px;
+background:linear-gradient(90deg,var(--primaria),var(--secundaria));
+}
+
+/* BNCC */
+
+#resultadoBNCC .card,
+#listaFavoritosBNCC .card{
+text-align:left;
+border-left:6px solid var(--primaria);
+}
+
+#resultadoBNCC h3,
+#listaFavoritosBNCC h3{
+font-size:22px;
+color:var(--primaria);
+margin-top:0;
+}
+
+#contadorBNCC{
+font-size:18px;
+font-weight:800;
+}
+
+/* CORREÇÃO */
+
+canvas{
+margin-top:15px;
+border-radius:20px;
+border:2px solid var(--borda);
+background:var(--card);
+max-width:100%;
+box-shadow:var(--sombra);
+}
+
+#canvas{
+width:100%;
+max-width:420px;
+}
+
+#painelCorrecao .card{
+text-align:left;
+border-left:6px solid var(--primaria);
+}
+
+#resultado{
+background:var(--card);
+border:1px solid var(--borda);
+border-left:6px solid var(--sucesso);
+border-radius:24px;
+padding:20px;
+box-shadow:var(--sombra);
+text-align:left;
+line-height:1.6;
+}
+
+/* DASHBOARD */
+
+#melhoresBNCC .card{
+border-left:8px solid var(--sucesso) !important;
+}
+
+#pioresBNCC .card{
+border-left:8px solid var(--erro) !important;
+}
+
+#alunosAtencaoPainel .card{
+border-left:8px solid var(--alerta) !important;
+}
+
+/* TOAST */
+
+.toast{
+position:fixed;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+background:linear-gradient(135deg,var(--primaria),var(--secundaria));
+color:white;
+padding:16px 24px;
+border-radius:18px;
+font-weight:800;
+box-shadow:0 10px 25px rgba(0,0,0,.25);
+z-index:99999;
+animation:toastEntrada .3s ease;
+}
+
+@keyframes toastEntrada{
+from{
+opacity:0;
+transform:translateX(-50%) translateY(-20px);
+}
+to{
+opacity:1;
+transform:translateX(-50%) translateY(0);
+}
+}
+
+/* SPLASH */
+
+.splashTela{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+background:var(--splashFundo);
+padding:30px;
+text-align:center;
+position:relative;
+overflow:hidden;
+}
+
+.logoSplash{
+width:340px;
+box-shadow:none !important;
+border-radius:0;
+position:relative;
+z-index:2;
+animation:zoomLogo .8s ease-out;
+}
+
+.glowSplash{
+position:absolute;
+width:260px;
+height:260px;
+border-radius:50%;
+background:radial-gradient(circle,rgba(74,108,247,.28),rgba(139,92,246,.18),transparent 70%);
+filter:blur(18px);
+top:27%;
+left:50%;
+transform:translateX(-50%);
+animation:pulseGlow 2s infinite alternate;
+}
+
+.barraSplash{
+margin-top:15px;
+width:80%;
+max-width:300px;
+height:28px;
+background:var(--splashBarraFundo);
+border-radius:999px;
+overflow:hidden;
+position:relative;
+z-index:2;
+}
+
+#barraLoad{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#38BDF8,#4A6CF7,#8B5CF6);
+border-radius:999px;
+transition:.2s;
+}
+
+#textoLoad{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:13px;
+font-weight:800;
+color:white;
+text-shadow:0 2px 6px rgba(0,0,0,.35);
+}
+
+#statusSplash{
+margin-top:12px;
+font-size:24px;
+font-weight:900;
+color:var(--splashTexto);
+position:relative;
+z-index:2;
+}
+
+@keyframes zoomLogo{
+from{
+transform:scale(.75);
+opacity:0;
+}
+to{
+transform:scale(1);
+opacity:1;
+}
+}
+
+@keyframes pulseGlow{
+from{
+opacity:.5;
+transform:translateX(-50%) scale(.9);
+}
+to{
+opacity:1;
+transform:translateX(-50%) scale(1.15);
+}
+}
+
+/* IMPRESSÃO */
+
+@media print{
+.bottomBar,
+button{
+display:none !important;
+}
+
+body{
+background:white;
+color:black;
+padding:10px;
+}
+
+.card,
+div,
+li{
+box-shadow:none !important;
+border:1px solid #ddd;
+}
+}
+
+.material-icons-round{
+font-size:28px;
+line-height:1;
+}
+
+.iconeHome{
+font-family:'Material Icons Round';
+font-size:30px;
+color:var(--primaria);
+}
+
+.bottomIcon{
+font-family:'Material Icons Round';
+font-size:28px;
+}
+
+.botaoOculto{
+display:none !important;
+}
