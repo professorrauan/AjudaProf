@@ -2186,8 +2186,6 @@ html || "<div class='card'>Nenhum descritor encontrado.</div>";
 
 }
 
-document
-
 function renderizarDescritores(){
 
 let busca=document.getElementById("buscaDescritor").value
