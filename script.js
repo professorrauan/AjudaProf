@@ -4999,12 +4999,13 @@ async function carregarBases(){
 try{
 
 const respostaBNCC =
-await fetch("dados/bncc.json");
+await fetch("./dados/bncc.json");
 
 baseBNCC =
 await respostaBNCC.json();
 
 if(Array.isArray(baseBNCC)){
+
 let codigosUnicos = {};
 
 bancoBNCC = baseBNCC.filter(item => {
@@ -5017,21 +5018,7 @@ codigosUnicos[item.codigo] = true;
 return true;
 
 });
-let codigosVistos = {};
-let duplicados = [];
 
-bancoBNCC.forEach(item => {
-  if (codigosVistos[item.codigo]) {
-    duplicados.push(item.codigo);
-  } else {
-    codigosVistos[item.codigo] = true;
-  }
-});
-
-if (duplicados.length > 0) {
-  console.log("⚠️ BNCC duplicadas:", duplicados);
-  alert("⚠️ Há " + duplicados.length + " habilidade(s) duplicada(s) no bncc.json.");
-}
 }
 else if(Array.isArray(baseBNCC.habilidades)){
 bancoBNCC = baseBNCC.habilidades;
@@ -5047,18 +5034,17 @@ alert("❌ Formato do bncc.json não reconhecido.");
 bancoBNCC = [];
 }
 
-console.log(baseBNCC);
-
 const respostaDescritores =
-await fetch("dados/descritores.json");
+await fetch("./dados/descritores.json");
 
-const respostaDescritores = await fetch("./dados/descritores.json");
+baseDescritores =
+await respostaDescritores.json();
+
+console.log("✅ BNCC carregada");
+console.log(bancoBNCC);
 
 console.log("✅ Descritores carregados");
 console.log(baseDescritores);
-
-console.log("✅ BNCC carregada");
-console.log(baseBNCC);
 
 }catch(erro){
 
