@@ -18,9 +18,19 @@ async function abrirCorrecao() {
   }
 
   document.body.innerHTML =
-    ` <h1>Corrigir Prova</h1> <input id="foto" type="file" accept="image/*" capture style="display:none;"> <button id="abrirCamera"> <span class="material-icons-round">photo_camera</span> Tirar ou escolher foto </button> <br><br> <p>Arraste os pontos vermelhos até encaixar no gabarito. Depois ajuste o retângulo azul.</p> <button id="detectarGrade"> <span class="material-icons-round">center_focus_strong</span> Auto enquadrar gabarito </button> <canvas id="canvas" width="320"></canvas> <div id="painelCorrecao" style="display:none;"> <select id="turmaSelecionada"> <option value="">Selecionar turma</option> </select> <br><br> <select id="aluno"> <option value="">Selecionar aluno</option> </select> <br><br> <div class="card"> <h3>Configuração da prova</h3> <input id="totalQuestoes" type="number" min="1" placeholder="Quantidade de questões. Ex: 10"> <input id="valorProva" type="number" min="0" step="0.1" placeholder="Valor da prova. Ex: 10"> <input id="gabarito" placeholder="Gabarito. Ex: A,B,C,D,A"> <input id="habilidadeProva" placeholder="Habilidade BNCC. Ex: EF06MA01"> <input id="descritorProva" placeholder="Descritor. Ex: D1, D2, D5"> <button id="salvarGabarito">Salvar Gabarito</button> </div> <br> <div class="card"> <h3>Modelo de gabarito</h3> <select id="modeloOMR"> <option value="">Modelo padrão</option> </select> <button id="salvarModeloOMR">Salvar modelo ajustado</button> <button id="excluirModeloOMR">Excluir modelo selecionado</button> </div> <button id="debugVisual">Debug Visual: Ligado</button> <button id="analisar">Analisar Marcações</button> <p id="resultado"></p> <button onclick="document.getElementById('foto').click();"> Foto do próximo aluno </button> </div> <button onclick="voltarHome()">Voltar</button> ` + barraInferior("provas");
+    ` <h1>Corrigir Prova</h1> <input id="foto" type="file" accept="image/*" capture style="display:none;"> <button id="abrirCamera"> <span class="material-icons-round">photo_camera</span> Tirar ou escolher foto </button> <br><br> <p>Arraste os pontos vermelhos até encaixar no gabarito. Depois ajuste o retângulo azul.</p> <button id="detectarGrade"> <span class="material-icons-round">center_focus_strong</span> Auto enquadrar gabarito </button> <canvas id="canvas" width="320"></canvas> <div id="painelCorrecao" style="display:none;"> <select id="turmaSelecionada"> <option value="">Selecionar turma</option> </select> <br><br> <select id="aluno"> <option value="">Selecionar aluno</option> </select> <br><br> <div class="card"> <h3>Configuração da prova</h3> <input id="totalQuestoes" type="number" min="1" placeholder="Quantidade de questões. Ex: 10"> <input id="valorProva" type="number" min="0" step="0.1" placeholder="Valor da prova. Ex: 10"> <input id="gabarito" placeholder="Gabarito. Ex: A,B,C,D,A"> <input id="habilidadeProva" placeholder="Habilidade BNCC. Ex: EF06MA01"> <input id="descritorProva" placeholder="Descritor. Ex: D1, D2, D5"> <button id="salvarGabarito">Salvar Gabarito</button> </div> <br> <div class="card"> <h3>Modelo de gabarito</h3> <select id="modeloOMR"> <option value="">Modelo padrão</option> <option value="marcadores4">Gabarito com 4 marcadores (10 questões)</option> </select> <button id="salvarModeloOMR">Salvar modelo ajustado</button> <button id="excluirModeloOMR">Excluir modelo selecionado</button> </div> <button id="debugVisual">Debug Visual: Ligado</button> <button id="analisar" class="botao-analisar-destaque"> <span class="material-icons-round">fact_check</span> Analisar Marcações </button> <p id="resultado"></p> <button onclick="document.getElementById('foto').click();"> Foto do próximo aluno </button> </div> <button onclick="voltarHome()">Voltar</button> ` +
+    barraInferior("provas");
 
   aplicarTemaSalvo();
+
+  // Destaque visual do botão principal da correção.
+  // O CSS é inserido aqui para que o arquivo funcione sem exigir alteração no style.css.
+  if (!document.getElementById("estilo-correcao-omr")) {
+    const estiloCorrecao = document.createElement("style");
+    estiloCorrecao.id = "estilo-correcao-omr";
+    estiloCorrecao.textContent = ` .botao-analisar-destaque { width: min(100%, 520px); min-height: 54px; margin: 18px auto 10px; padding: 14px 20px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 16px; background: linear-gradient(135deg, #1565c0, #3949ab); color: #fff; font-size: 1.05rem; font-weight: 800; letter-spacing: .2px; box-shadow: 0 8px 22px rgba(21, 101, 192, .32); cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, filter .18s ease; } .botao-analisar-destaque .material-icons-round { font-size: 25px; } .botao-analisar-destaque:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(21, 101, 192, .4); filter: brightness(1.04); } .botao-analisar-destaque:active { transform: translateY(1px); } .botao-analisar-destaque:disabled { opacity: .72; cursor: wait; transform: none; } @media (prefers-color-scheme: dark) { .botao-analisar-destaque { background: linear-gradient(135deg, #42a5f5, #7e57c2); color: #07111f; box-shadow: 0 8px 22px rgba(66, 165, 245, .28); } } `;
+    document.head.appendChild(estiloCorrecao);
+  }
 
   let canvas = document.getElementById("canvas");
   let ctx = canvas.getContext("2d");
@@ -113,35 +123,91 @@ async function abrirCorrecao() {
     alert("✅ Configuração da prova salva.");
   };
 
-  function carregarModelosOMR() {
-    let modelos = JSON.parse(localStorage.getItem("modelosOMR")) || [];
-    let select = document.getElementById("modeloOMR");
+  const MODELO_MARCADORES_4 = {
+    nome: "Gabarito com 4 marcadores (10 questões)",
+    prova: { totalQuestoes: 10 },
+    area: {
+      // Limites da grade de respostas em relação ao retângulo formado
+      // pelos centros dos quatro quadrados pretos.
+      x1: 0.22,
+      x2: 0.06,
+      y1: 0.09,
+      y2: 0.02,
+    },
+    omr: {
+      alternativas: ["A", "B", "C", "D"],
+      colunas: [0.15, 0.39, 0.64, 0.88],
+      topoBolhas: 0.04,
+      baixoBolhas: 0.04,
+      raioLeitura: 6,
+      limiteMarcado: 0.16,
+      diferencaMinima: 0.045,
+    },
+  };
 
-    select.innerHTML = `<option value="">📄 Modelo padrão</option>`;
+  function obterModeloSelecionado() {
+    const valor = document.getElementById("modeloOMR").value;
+
+    if (valor === "marcadores4") {
+      return MODELO_MARCADORES_4;
+    }
+
+    if (valor === "") {
+      return null;
+    }
+
+    const modelos = JSON.parse(localStorage.getItem("modelosOMR")) || [];
+    const index = Number(valor);
+
+    return Number.isInteger(index) ? modelos[index] || null : null;
+  }
+
+  function carregarModelosOMR() {
+    const modelos = JSON.parse(localStorage.getItem("modelosOMR")) || [];
+    const select = document.getElementById("modeloOMR");
+    const valorAtual = select.value;
+
+    select.innerHTML =
+      `<option value="">📄 Modelo padrão</option>` +
+      `<option value="marcadores4">⬛ Gabarito com 4 marcadores (10 questões)</option>`;
 
     modelos.forEach((modelo, index) => {
       select.innerHTML += ` <option value="${index}">${modelo.nome}</option> `;
     });
+
+    if ([...select.options].some((opcao) => opcao.value === valorAtual)) {
+      select.value = valorAtual;
+    }
   }
 
   carregarModelosOMR();
 
   document.getElementById("modeloOMR").onchange = function () {
-    let index = this.value;
-
-    if (index === "") return;
-
-    let modelos = JSON.parse(localStorage.getItem("modelosOMR")) || [];
-    let modelo = modelos[index];
+    const modelo = obterModeloSelecionado();
 
     if (!modelo) return;
 
     if (modelo.prova) {
-      document.getElementById("totalQuestoes").value =
-        modelo.prova.totalQuestoes || "";
-      document.getElementById("valorProva").value =
-        modelo.prova.valorProva || "";
-      document.getElementById("gabarito").value = modelo.prova.gabarito || "";
+      if (modelo.prova.totalQuestoes) {
+        document.getElementById("totalQuestoes").value =
+          modelo.prova.totalQuestoes;
+      }
+
+      if (modelo.prova.valorProva) {
+        document.getElementById("valorProva").value = modelo.prova.valorProva;
+      }
+
+      if (modelo.prova.gabarito) {
+        document.getElementById("gabarito").value = modelo.prova.gabarito;
+      }
+    }
+
+    if (
+      this.value === "marcadores4" &&
+      imagem.complete &&
+      imagem.naturalWidth
+    ) {
+      detectarGrade();
     }
   };
 
@@ -152,6 +218,15 @@ async function abrirCorrecao() {
       alert("Selecione um modelo para excluir.");
       return;
     }
+
+    if (index === "marcadores4") {
+      alert(
+        "O modelo de 4 marcadores é padrão do aplicativo e não pode ser excluído."
+      );
+      return;
+    }
+
+    index = Number(index);
 
     let modelos = JSON.parse(localStorage.getItem("modelosOMR")) || [];
 
@@ -217,98 +292,198 @@ async function abrirCorrecao() {
   function detectarGrade() {
     desenhar();
 
-    let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    let data = imgData.data;
-    let w = canvas.width;
-    let h = canvas.height;
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imgData.data;
+    const w = canvas.width;
+    const h = canvas.height;
+    const limiteEscuro = 105;
 
-    function brilhoPixel(x, y) {
-      let i = (y * w + x) * 4;
-      return (data[i] + data[i + 1] + data[i + 2]) / 3;
+    function pixelEscuro(x, y) {
+      const i = (y * w + x) * 4;
+      const brilho = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      return brilho < limiteEscuro;
     }
 
-    let candidatos = [];
-    let tam = 26;
-    let passo = 4;
+    // Localiza componentes escuros conectados. Os marcadores são grandes,
+    // aproximadamente quadrados e muito mais preenchidos que textos e linhas.
+    const visitado = new Uint8Array(w * h);
+    const componentes = [];
+    const minLado = Math.max(7, Math.round(w * 0.022));
+    const maxLado = Math.max(34, Math.round(w * 0.16));
 
-    for (let y = 0; y < h - tam; y += passo) {
-      for (let x = 0; x < w - tam; x += passo) {
-        let pretos = 0;
-        let total = 0;
+    for (let y = 2; y < h - 2; y++) {
+      for (let x = 2; x < w - 2; x++) {
+        const inicio = y * w + x;
 
-        for (let yy = 0; yy < tam; yy += 2) {
-          for (let xx = 0; xx < tam; xx += 2) {
-            if (brilhoPixel(x + xx, y + yy) < 90) pretos++;
+        if (visitado[inicio] || !pixelEscuro(x, y)) continue;
 
-            total++;
+        const fila = [inicio];
+        visitado[inicio] = 1;
+        let cursor = 0;
+        let quantidade = 0;
+        let minX = x;
+        let maxX = x;
+        let minY = y;
+        let maxY = y;
+
+        while (cursor < fila.length) {
+          const atual = fila[cursor++];
+          const px = atual % w;
+          const py = Math.floor(atual / w);
+
+          quantidade++;
+          if (px < minX) minX = px;
+          if (px > maxX) maxX = px;
+          if (py < minY) minY = py;
+          if (py > maxY) maxY = py;
+
+          const vizinhos = [atual - 1, atual + 1, atual - w, atual + w];
+
+          for (const vizinho of vizinhos) {
+            if (vizinho < 0 || vizinho >= w * h || visitado[vizinho]) continue;
+
+            const vx = vizinho % w;
+            const vy = Math.floor(vizinho / w);
+
+            if (Math.abs(vx - px) + Math.abs(vy - py) !== 1) continue;
+            if (!pixelEscuro(vx, vy)) continue;
+
+            visitado[vizinho] = 1;
+            fila.push(vizinho);
           }
         }
 
-        let densidade = pretos / total;
-
-        let cx = x + tam / 2;
-        let cy = y + tam / 2;
-
-        let margemX = w * 0.08;
-        let margemY = h * 0.08;
+        const largura = maxX - minX + 1;
+        const altura = maxY - minY + 1;
+        const proporcao = largura / altura;
+        const preenchimento = quantidade / (largura * altura);
 
         if (
-          densidade > 0.55 &&
-          cx > margemX &&
-          cx < w - margemX &&
-          cy > margemY &&
-          cy < h - margemY
+          largura >= minLado &&
+          altura >= minLado &&
+          largura <= maxLado &&
+          altura <= maxLado &&
+          proporcao >= 0.62 &&
+          proporcao <= 1.55 &&
+          preenchimento >= 0.48
         ) {
-          candidatos.push({
-            x: cx,
-            y: cy,
-            densidade: densidade,
+          componentes.push({
+            x: (minX + maxX) / 2,
+            y: (minY + maxY) / 2,
+            largura,
+            altura,
+            preenchimento,
+            area: quantidade,
           });
         }
       }
     }
 
-    let filtrados = [];
+    // Remove candidatos muito próximos, mantendo o mais sólido.
+    const candidatos = [];
 
-    candidatos
-      .sort((a, b) => b.densidade - a.densidade)
-      .forEach((c) => {
-        let perto = filtrados.some((f) => {
-          return Math.hypot(f.x - c.x, f.y - c.y) < 35;
-        });
+    componentes
+      .sort((a, b) => b.area * b.preenchimento - a.area * a.preenchimento)
+      .forEach((componente) => {
+        const distanciaMinima = Math.max(
+          18,
+          Math.min(componente.largura, componente.altura) * 1.8
+        );
+        const repetido = candidatos.some(
+          (outro) =>
+            Math.hypot(outro.x - componente.x, outro.y - componente.y) <
+            distanciaMinima
+        );
 
-        if (!perto) filtrados.push(c);
+        if (!repetido) candidatos.push(componente);
       });
 
-    if (filtrados.length < 4) {
+    if (candidatos.length < 4) {
       document.getElementById("resultado").innerHTML =
-        "⚠ Não encontrei os 4 quadrados pretos. Ajuste manualmente.";
+        "⚠ Não encontrei os 4 quadrados pretos. Aproxime a câmera, evite sombras e ajuste manualmente os pontos vermelhos.";
       return;
     }
 
-    function canto(tipo) {
-      let melhor = null;
+    // Testa combinações de quatro candidatos e escolhe o retângulo mais amplo
+    // com dois pontos na parte superior e dois na parte inferior.
+    const limiteCandidatos = candidatos.slice(0, 14);
+    let melhorConjunto = null;
+    let melhorPontuacao = -Infinity;
 
-      filtrados.forEach((p) => {
-        let score = 0;
+    for (let a = 0; a < limiteCandidatos.length - 3; a++) {
+      for (let b = a + 1; b < limiteCandidatos.length - 2; b++) {
+        for (let c = b + 1; c < limiteCandidatos.length - 1; c++) {
+          for (let d = c + 1; d < limiteCandidatos.length; d++) {
+            const grupo = [
+              limiteCandidatos[a],
+              limiteCandidatos[b],
+              limiteCandidatos[c],
+              limiteCandidatos[d],
+            ];
 
-        if (tipo === "SE") score = p.x + p.y;
-        if (tipo === "SD") score = w - p.x + p.y;
-        if (tipo === "IE") score = p.x + (h - p.y);
-        if (tipo === "ID") score = w - p.x + (h - p.y);
+            const ordenadosY = [...grupo].sort((p1, p2) => p1.y - p2.y);
+            const superiores = ordenadosY
+              .slice(0, 2)
+              .sort((p1, p2) => p1.x - p2.x);
+            const inferiores = ordenadosY
+              .slice(2)
+              .sort((p1, p2) => p1.x - p2.x);
+            const se = superiores[0];
+            const sd = superiores[1];
+            const ie = inferiores[0];
+            const id = inferiores[1];
 
-        if (!melhor || score < melhor.score) {
-          melhor = { ...p, score: score };
+            const larguraTopo = Math.hypot(sd.x - se.x, sd.y - se.y);
+            const larguraBaixo = Math.hypot(id.x - ie.x, id.y - ie.y);
+            const alturaEsquerda = Math.hypot(ie.x - se.x, ie.y - se.y);
+            const alturaDireita = Math.hypot(id.x - sd.x, id.y - sd.y);
+
+            if (larguraTopo < w * 0.28 || larguraBaixo < w * 0.28) continue;
+            if (alturaEsquerda < h * 0.3 || alturaDireita < h * 0.3) continue;
+
+            const diferencaLargura =
+              Math.abs(larguraTopo - larguraBaixo) /
+              Math.max(larguraTopo, larguraBaixo);
+            const diferencaAltura =
+              Math.abs(alturaEsquerda - alturaDireita) /
+              Math.max(alturaEsquerda, alturaDireita);
+            const alinhamentoTopo = Math.abs(se.y - sd.y) / h;
+            const alinhamentoBaixo = Math.abs(ie.y - id.y) / h;
+            const alinhamentoEsquerda = Math.abs(se.x - ie.x) / w;
+            const alinhamentoDireita = Math.abs(sd.x - id.x) / w;
+
+            const areaRetangulo =
+              ((larguraTopo + larguraBaixo) / 2) *
+              ((alturaEsquerda + alturaDireita) / 2);
+            const penalidade =
+              (diferencaLargura + diferencaAltura) * 2 +
+              alinhamentoTopo +
+              alinhamentoBaixo +
+              alinhamentoEsquerda +
+              alinhamentoDireita;
+            const solidez = grupo.reduce(
+              (soma, item) => soma + item.preenchimento,
+              0
+            );
+            const pontuacao =
+              areaRetangulo / (w * h) + solidez * 0.08 - penalidade;
+
+            if (pontuacao > melhorPontuacao) {
+              melhorPontuacao = pontuacao;
+              melhorConjunto = { se, sd, ie, id };
+            }
+          }
         }
-      });
-
-      return melhor;
+      }
     }
 
-    let se = canto("SE");
-    let sd = canto("SD");
-    let ie = canto("IE");
-    let id = canto("ID");
+    if (!melhorConjunto) {
+      document.getElementById("resultado").innerHTML =
+        "⚠ Encontrei áreas escuras, mas não consegui formar os quatro cantos do gabarito. Ajuste os pontos vermelhos manualmente.";
+      return;
+    }
+
+    const { se, sd, ie, id } = melhorConjunto;
 
     pontos = [
       { x: se.x, y: se.y },
@@ -317,28 +492,19 @@ async function abrirCorrecao() {
       { x: id.x, y: id.y },
     ];
 
-    let xMin = Math.min(se.x, ie.x);
-    let xMax = Math.max(sd.x, id.x);
-    let yMin = Math.min(se.y, sd.y);
-    let yMax = Math.max(ie.y, id.y);
-
-    let largura = xMax - xMin;
-    let altura = yMax - yMin;
-
-    let modelos = JSON.parse(localStorage.getItem("modelosOMR")) || [];
-    let modeloSelecionado = document.getElementById("modeloOMR").value;
-
-    let calibracao =
-      modeloSelecionado !== "" ? modelos[modeloSelecionado] : null;
-
-    let areaCalibrada = calibracao
-      ? calibracao.area
-      : {
-          x1: 0.28,
-          x2: 0.14,
-          y1: 0.07,
-          y2: 0.1,
-        };
+    const xMin = Math.min(se.x, ie.x);
+    const xMax = Math.max(sd.x, id.x);
+    const yMin = Math.min(se.y, sd.y);
+    const yMax = Math.max(ie.y, id.y);
+    const largura = xMax - xMin;
+    const altura = yMax - yMin;
+    const calibracao = obterModeloSelecionado();
+    const areaCalibrada = calibracao?.area || {
+      x1: 0.28,
+      x2: 0.14,
+      y1: 0.07,
+      y2: 0.1,
+    };
 
     window.areaTabelaOMR = {
       x1: xMin + largura * areaCalibrada.x1,
@@ -350,7 +516,9 @@ async function abrirCorrecao() {
     desenhar();
 
     document.getElementById("resultado").innerHTML =
-      "✅ Área da tabela OMR detectada. Ajuste o retângulo azul se necessário.";
+      document.getElementById("modeloOMR").value === "marcadores4"
+        ? "✅ Quatro marcadores encontrados e grade de 10 questões enquadrada. Confira o retângulo azul antes de analisar."
+        : "✅ Área da tabela OMR detectada. Ajuste o retângulo azul se necessário.";
   }
 
   document.getElementById("detectarGrade").onclick = function () {
@@ -379,6 +547,10 @@ async function abrirCorrecao() {
       desenhar();
 
       document.getElementById("painelCorrecao").style.display = "block";
+
+      if (document.getElementById("modeloOMR").value === "marcadores4") {
+        setTimeout(detectarGrade, 80);
+      }
     };
   };
 
@@ -535,23 +707,17 @@ async function abrirCorrecao() {
         document.getElementById("valorProva").value.replace(",", ".")
       ) || 10;
 
-    let modelos = JSON.parse(localStorage.getItem("modelosOMR")) || [];
-    let modeloSelecionado = document.getElementById("modeloOMR").value;
+    const calibracao = obterModeloSelecionado();
 
-    let calibracao =
-      modeloSelecionado !== "" ? modelos[modeloSelecionado] : null;
-
-    let configOMR = calibracao
-      ? calibracao.omr
-      : {
-          alternativas: ["A", "B", "C", "D"],
-          colunas: [0.18, 0.4, 0.62, 0.84],
-          topoBolhas: 0.04,
-          baixoBolhas: 0.04,
-          raioLeitura: 5,
-          limiteMarcado: 0.18,
-          diferencaMinima: 0.05,
-        };
+    const configOMR = calibracao?.omr || {
+      alternativas: ["A", "B", "C", "D"],
+      colunas: [0.18, 0.4, 0.62, 0.84],
+      topoBolhas: 0.04,
+      baixoBolhas: 0.04,
+      raioLeitura: 5,
+      limiteMarcado: 0.18,
+      diferencaMinima: 0.05,
+    };
 
     let respostas = [];
 
@@ -887,7 +1053,8 @@ async function abrirCorrecao() {
       if (botaoAnalisar) {
         botaoAnalisar.disabled = false;
 
-        botaoAnalisar.innerHTML = "Analisar Marcações";
+        botaoAnalisar.innerHTML =
+          "<span class='material-icons-round'>fact_check</span> Analisar Marcações";
       }
     }
   };
