@@ -16,8 +16,6 @@ let estadoConfirmadoTurmas = [];
 
 let versaoEstadoTurmas = 0;
 
-let cancelarAtualizacaoTelaTurmas = null;
-
 /* ========================================================= FUNÇÕES AUXILIARES ========================================================= */
 
 function clonarDadosTurmas(valor) {
@@ -303,64 +301,9 @@ function obterTurmaPorIndice(index) {
   return turmas[Number(index)];
 }
 
-/* ========================================================= FIREBASE — CICLO DE VIDA E EVENTOS ========================================================= */
-
-function encerrarEscutaTurmasFirebase() {
-  if (typeof cancelarEscutaTurmas === "function") {
-    try {
-      cancelarEscutaTurmas();
-    } catch (erro) {
-      console.warn("Não foi possível encerrar a escuta das turmas:", erro);
-    }
-  }
-
-  cancelarEscutaTurmas = null;
-  uidEscutaTurmas = null;
-  usuarioTurmasAtual = null;
-  referenciaDocumentoTurmas = null;
-
-  if (typeof cancelarAtualizacaoTelaTurmas === "function") {
-    cancelarAtualizacaoTelaTurmas();
-  }
-
-  cancelarAtualizacaoTelaTurmas = null;
-  turmasFirebase = [];
-  estadoConfirmadoTurmas = [];
-  salvamentosTurmasPendentes = 0;
-  filaSalvamentoTurmas = Promise.resolve();
-
-  window.dispatchEvent(
-    new CustomEvent("turmasAtualizadasAjudaProf", {
-      detail: {
-        uid: null,
-        turmas: [],
-        origem: "sessao-encerrada",
-      },
-    })
-  );
-}
-
-function notificarAtualizacaoTurmas(origem = "nuvem") {
-  const usuario = window.auth?.currentUser || null;
-
-  window.dispatchEvent(
-    new CustomEvent("turmasAtualizadasAjudaProf", {
-      detail: {
-        uid: usuario?.uid || null,
-        turmas: obterTurmasSalvas(),
-        origem,
-      },
-    })
-  );
-}
-
-window.encerrarEscutaTurmasFirebase = encerrarEscutaTurmasFirebase;
-
-window.iniciarEscutaTurmasFirebase = carregarTurmasFirebase;
-
 /* ========================================================= FIREBASE — CARREGAMENTO ========================================================= */
 
-function aplicarSnapshotTurmas(snapshot, origem = "nuvem") {
+function aplicarSnapshotTurmas(snapshot) {
   let dadosNormalizados = [];
 
   if (snapshot.exists()) {
@@ -374,8 +317,6 @@ function aplicarSnapshotTurmas(snapshot, origem = "nuvem") {
   turmasFirebase = clonarDadosTurmas(dadosNormalizados);
 
   estadoConfirmadoTurmas = clonarDadosTurmas(dadosNormalizados);
-
-  notificarAtualizacaoTurmas(origem);
 }
 
 async function carregarTurmasFirebase() {
@@ -390,7 +331,16 @@ async function carregarTurmasFirebase() {
   const usuario = window.auth.currentUser;
 
   if (!usuario) {
-    encerrarEscutaTurmasFirebase();
+    if (cancelarEscutaTurmas) {
+      cancelarEscutaTurmas();
+    }
+
+    cancelarEscutaTurmas = null;
+    uidEscutaTurmas = null;
+    usuarioTurmasAtual = null;
+    referenciaDocumentoTurmas = null;
+    turmasFirebase = [];
+
     return [];
   }
 
@@ -410,62 +360,32 @@ async function carregarTurmasFirebase() {
     const snapshotInicial = await getDoc(referenciaDocumentoTurmas);
 
     if (salvamentosTurmasPendentes === 0) {
-      aplicarSnapshotTurmas(snapshotInicial, "carregamento-inicial");
+      aplicarSnapshotTurmas(snapshotInicial);
     }
   } catch (erro) {
     console.error("Erro ao carregar turmas do Firebase:", erro);
   }
 
   if (cancelarEscutaTurmas && uidEscutaTurmas !== usuario.uid) {
-    encerrarEscutaTurmasFirebase();
-
-    usuarioTurmasAtual = usuario;
-
-    referenciaDocumentoTurmas = doc(
-      window.db,
-      "usuarios",
-      usuario.uid,
-      "dados",
-      "turmas"
-    );
+    cancelarEscutaTurmas();
+    cancelarEscutaTurmas = null;
   }
 
   if (!cancelarEscutaTurmas) {
-    const uidDaEscuta = usuario.uid;
-
-    uidEscutaTurmas = uidDaEscuta;
+    uidEscutaTurmas = usuario.uid;
 
     cancelarEscutaTurmas = onSnapshot(
       referenciaDocumentoTurmas,
 
       (snapshot) => {
-        const usuarioAtual = window.auth?.currentUser || null;
-
-        if (
-          !usuarioAtual ||
-          usuarioAtual.uid !== uidDaEscuta ||
-          uidEscutaTurmas !== uidDaEscuta
-        ) {
-          return;
-        }
-
         if (salvamentosTurmasPendentes > 0) {
           return;
         }
 
-        aplicarSnapshotTurmas(
-          snapshot,
-          snapshot.metadata?.fromCache ? "cache" : "tempo-real"
-        );
+        aplicarSnapshotTurmas(snapshot);
       },
 
       (erro) => {
-        const usuarioAtual = window.auth?.currentUser || null;
-
-        if (!usuarioAtual || usuarioAtual.uid !== uidDaEscuta) {
-          return;
-        }
-
         console.error("Erro na escuta das turmas:", erro);
       }
     );
@@ -545,7 +465,7 @@ async function salvarTurmasFirebase() {
 
         const snapshot = await getDoc(referenciaDocumentoTurmas);
 
-        aplicarSnapshotTurmas(snapshot, "pos-salvamento");
+        aplicarSnapshotTurmas(snapshot);
       } catch (erro) {
         console.warn(
           "Não foi possível sincronizar as turmas após o salvamento:",
@@ -736,39 +656,6 @@ async function abrirTurmas() {
 
     listaTurmas.innerHTML = html;
   }
-
-  if (typeof cancelarAtualizacaoTelaTurmas === "function") {
-    cancelarAtualizacaoTelaTurmas();
-  }
-
-  const controladorAtualizacaoTurmas = new AbortController();
-
-  cancelarAtualizacaoTelaTurmas = function () {
-    controladorAtualizacaoTurmas.abort();
-  };
-
-  window.addEventListener(
-    "turmasAtualizadasAjudaProf",
-    async (evento) => {
-      const usuarioAtual = window.auth?.currentUser || null;
-
-      if (!usuarioAtual || evento.detail?.uid !== usuarioAtual.uid) {
-        return;
-      }
-
-      if (
-        !document.getElementById("listaTurmas") ||
-        !document.getElementById("contadorTurmas")
-      ) {
-        return;
-      }
-
-      await atualizarTurmas();
-    },
-    {
-      signal: controladorAtualizacaoTurmas.signal,
-    }
-  );
 
   async function criarTurma() {
     const nome = campoNomeTurma.value.trim();
@@ -4196,7 +4083,7 @@ async function abrirControleAtividades(indexTurma, indexAvaliacao) {
     }
   ).join(
     ""
-  )} </select> <p class="textoSecundarioConfig"> Selecione um exercício para editá-lo na tabela ou excluí-lo. </p> </div> <div class="acoes"> <button id="adicionarExercicioAtividade" class="btnAzul" type="button" > <span class="material-icons-round"> add </span> Novo exercício </button> <button id="excluirExercicioAtividade" class="btnVermelho" type="button" > <span class="material-icons-round"> delete </span> Excluir selecionado </button> <button id="abrirPendenciasAtividadeBotao" class="btnLaranja" type="button" > <span class="material-icons-round"> warning </span> Ver pendências </button> </div> </div> </section> <section class="painel"> <div class="painelBlocoCabecalho"> <div> <h2> 📋 Planilha de exercícios </h2> <p> Toque em uma célula para marcar ou desmarcar o exercício do aluno. </p> </div> </div> <div style=" width:100%; overflow:auto; " > <table class="tabelaAtividades"> <thead> <tr> <th class="colAluno"> Aluno </th> `;
+  )} </select> <p class="textoSecundarioConfig"> Selecione um exercício para editá-lo na tabela ou excluí-lo. </p> </div> <div class="acoes"> <button id="adicionarExercicioAtividade" class="btnAzul" type="button" > <span class="material-icons-round"> add </span> Novo exercício </button> <button id="excluirExercicioAtividade" class="btnVermelho" type="button" > <span class="material-icons-round"> delete </span> Excluir selecionado </button> <button id="abrirPendenciasAtividadeBotao" class="btnLaranja" type="button" > <span class="material-icons-round"> warning </span> Ver pendências </button> </div> </div> </section> <section class="painel painelPlanilhaAtividades"> <div class="painelBlocoCabecalho"> <div> <h2> 📋 Planilha de exercícios </h2> <p> Toque em uma célula para marcar ou desmarcar o exercício do aluno. </p> </div> </div> <div class="planilhaAtividadesScroll"> <table class="tabelaAtividades"> <thead> <tr> <th class="colAluno"> Aluno </th> `;
 
   /* ======================================================= CABEÇALHOS DOS EXERCÍCIOS ======================================================= */
 
@@ -4956,18 +4843,200 @@ async function abrirControleAtividades(indexTurma, indexAvaliacao) {
           )} ${escaparHTMLTurmas(dataExercicio)} </li> `;
         }
 
-        htmlPendencias += ` <div class="card textoEsquerda" style=" page-break-inside:avoid; border-left: 8px solid var(--alerta); " > <h3> 👨‍🎓 ${escaparHTMLTurmas(
-          aluno
-        )} </h3> <p> ✅ Realizados: <strong> ${feitos} </strong> </p> <p> 🚨 Pendentes: <strong> ${pendentes} </strong> </p> <ul> ${itensPendentes} </ul> </div> `;
+        const percentualAlunoPendencias =
+          quantidadeExercicios > 0
+            ? Math.round((feitos / quantidadeExercicios) * 100)
+            : 0;
+
+        htmlPendencias += `
+          <article class="fichaPendenciaAtividade">
+            <div class="fichaPendenciaTopo">
+              <div class="fichaPendenciaIdentidade">
+                <span class="material-icons-round fichaPendenciaAvatar">person</span>
+                <div>
+                  <span class="fichaPendenciaRotulo">Estudante</span>
+                  <h3>${escaparHTMLTurmas(aluno)}</h3>
+                </div>
+              </div>
+
+              <div class="fichaPendenciaStatus">
+                <span class="statusPendenciaChip">
+                  ${pendentes} pendente${pendentes === 1 ? "" : "s"}
+                </span>
+              </div>
+            </div>
+
+            <div class="fichaPendenciaResumo">
+              <div>
+                <span>Realizados</span>
+                <strong>${feitos}/${quantidadeExercicios}</strong>
+              </div>
+              <div>
+                <span>Conclusão</span>
+                <strong>${percentualAlunoPendencias}%</strong>
+              </div>
+              <div>
+                <span>Pendências</span>
+                <strong>${pendentes}</strong>
+              </div>
+            </div>
+
+            <div class="fichaPendenciaProgresso" aria-hidden="true">
+              <span style="width:${percentualAlunoPendencias}%"></span>
+            </div>
+
+            <div class="fichaPendenciaLista">
+              <h4>
+                <span class="material-icons-round">assignment_late</span>
+                Atividades que precisam ser realizadas
+              </h4>
+              <ul>${itensPendentes}</ul>
+            </div>
+
+            <div class="fichaPendenciaOrientacao">
+              <span class="material-icons-round">info</span>
+              <p>
+                O(a) estudante deverá realizar as atividades acima e devolvê-las
+                ao(à) professor(a) para atualização do registro.
+              </p>
+            </div>
+
+            <div class="fichaPendenciaCampos">
+              <div class="campoPendenciaData">
+                <span>Data da devolução</span>
+                <div class="linhaPreenchimento">____/____/________</div>
+              </div>
+
+              <div class="campoPendenciaAssinatura">
+                <span>Assinatura do responsável</span>
+                <div class="linhaAssinatura"></div>
+              </div>
+
+              <div class="campoPendenciaAssinatura">
+                <span>Nome do responsável</span>
+                <div class="linhaAssinatura"></div>
+              </div>
+            </div>
+
+            <div class="acoes fichaPendenciaAcoes">
+              <button
+                type="button"
+                class="btnSecundario"
+                onclick="imprimirFichaPendenciaAtividade(this)"
+              >
+                <span class="material-icons-round">print</span>
+                Imprimir este aluno
+              </button>
+            </div>
+          </article>
+        `;
       });
 
+      const percentualComPendencias =
+        totalAlunos > 0
+          ? Math.round((alunosComPendencias / totalAlunos) * 100)
+          : 0;
+
       document.body.innerHTML =
-        ` <div class="cabecalhoTela"> <div> <h1> 🚨 Pendências da Atividade </h1> <p> 📚 ${nomeTurmaSeguro} • ${nomeAvaliacaoSeguro} </p> </div> </div> <main class="secaoApp"> <section class="card textoEsquerda"> <h2> Resumo </h2> <p> Alunos com pendências: <strong> ${alunosComPendencias} </strong> </p> <p> Total de alunos: <strong> ${totalAlunos} </strong> </p> </section> <section class="painel"> <div class="painelBlocoCabecalho"> <div> <h2> 📋 Lista de pendências </h2> <p> Exercícios que ainda precisam ser realizados. </p> </div> </div> ${
-          alunosComPendencias > 0
-            ? htmlPendencias
-            : ` <div class="estadoVazioApp"> <span class="estadoVazioIcone material-icons-round"> task_alt </span> <h3> Nenhuma pendência </h3> <p> Todos os alunos concluíram os exercícios desta atividade. </p> </div> `
-        } </section> <div class="acoes"> <button type="button" onclick="window.print()" > <span class="material-icons-round"> print </span> Imprimir / Salvar PDF </button> <button class="btnAzul" type="button" onclick="abrirControleAtividades(${indexTurma},${indexAvaliacao})" > <span class="material-icons-round"> arrow_back </span> Voltar para a planilha </button> </div> </main> ` +
-        (typeof barraInferior === "function" ? barraInferior() : "");
+        `
+          <div class="cabecalhoTela cabecalhoPendenciasAtividade">
+            <div>
+              <span class="etiquetaTela">Controle de atividades</span>
+              <h1>
+                <span class="material-icons-round">assignment_late</span>
+                Pendências da Atividade
+              </h1>
+              <p>📚 ${nomeTurmaSeguro} • ${nomeAvaliacaoSeguro}</p>
+            </div>
+          </div>
+
+          <main class="secaoApp telaPendenciasAtividade">
+            <section class="resumoPendenciasAtividade">
+              <div class="resumoPendenciaCard destaque">
+                <span class="material-icons-round">warning_amber</span>
+                <div>
+                  <strong>${alunosComPendencias}</strong>
+                  <span>alunos com pendências</span>
+                </div>
+              </div>
+
+              <div class="resumoPendenciaCard">
+                <span class="material-icons-round">groups</span>
+                <div>
+                  <strong>${totalAlunos}</strong>
+                  <span>alunos na turma</span>
+                </div>
+              </div>
+
+              <div class="resumoPendenciaCard">
+                <span class="material-icons-round">percent</span>
+                <div>
+                  <strong>${percentualComPendencias}%</strong>
+                  <span>da turma com pendências</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="painel painelPendenciasAtividade">
+              <div class="painelBlocoCabecalho">
+                <div>
+                  <h2>
+                    <span class="material-icons-round">fact_check</span>
+                    Fichas de recuperação
+                  </h2>
+                  <p>
+                    Cada aluno possui uma ficha pronta para impressão e
+                    assinatura do responsável.
+                  </p>
+                </div>
+              </div>
+
+              <div class="listaFichasPendenciaAtividade">
+                ${
+                  alunosComPendencias > 0
+                    ? htmlPendencias
+                    : `
+                      <div class="estadoVazioApp">
+                        <span class="estadoVazioIcone material-icons-round">
+                          task_alt
+                        </span>
+                        <h3>Nenhuma pendência</h3>
+                        <p>
+                          Todos os alunos concluíram os exercícios desta atividade.
+                        </p>
+                      </div>
+                    `
+                }
+              </div>
+            </section>
+
+            <div class="acoes acoesPendenciasAtividade">
+              ${
+                alunosComPendencias > 0
+                  ? `
+                    <button
+                      type="button"
+                      class="btnAzul"
+                      onclick="window.print()"
+                    >
+                      <span class="material-icons-round">print</span>
+                      Imprimir todos
+                    </button>
+                  `
+                  : ""
+              }
+
+              <button
+                class="btnSecundario"
+                type="button"
+                onclick="abrirControleAtividades(${indexTurma},${indexAvaliacao})"
+              >
+                <span class="material-icons-round">arrow_back</span>
+                Voltar para a planilha
+              </button>
+            </div>
+          </main>
+        ` + (typeof barraInferior === "function" ? barraInferior() : "");
 
       if (typeof aplicarTemaSalvo === "function") {
         aplicarTemaSalvo();
@@ -4976,4 +5045,199 @@ async function abrirControleAtividades(indexTurma, indexAvaliacao) {
   }
 
   /* ======================================================= FIM DA FUNÇÃO ======================================================= */
+}
+
+function imprimirFichaPendenciaAtividade(botao) {
+  if (!botao) {
+    return;
+  }
+
+  const ficha = botao.closest(".fichaPendenciaAtividade");
+
+  if (!ficha) {
+    return;
+  }
+
+  const janela = window.open("", "_blank");
+
+  if (!janela) {
+    if (typeof mostrarAlerta === "function") {
+      mostrarAlerta({
+        titulo: "Impressão bloqueada",
+        mensagem:
+          "O navegador bloqueou a janela de impressão. Autorize pop-ups para o Ajuda+Prof e tente novamente.",
+        icone: "print_disabled",
+      });
+    }
+
+    return;
+  }
+
+  const conteudo = ficha.cloneNode(true);
+  const acoes = conteudo.querySelector(".fichaPendenciaAcoes");
+
+  if (acoes) {
+    acoes.remove();
+  }
+
+  janela.document.write(`
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ficha de recuperação</title>
+        <style>
+          @page {
+            size: A4 portrait;
+            margin: 12mm;
+          }
+
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            margin: 0;
+            color: #172033;
+            font-family: Arial, sans-serif;
+            line-height: 1.45;
+          }
+
+          .fichaPendenciaAtividade {
+            border: 1px solid #d7dce6;
+            border-radius: 16px;
+            padding: 22px;
+          }
+
+          .fichaPendenciaTopo {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #e5e7eb;
+          }
+
+          .fichaPendenciaIdentidade {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          }
+
+          .fichaPendenciaAvatar,
+          .material-icons-round {
+            display: none;
+          }
+
+          .fichaPendenciaRotulo,
+          .fichaPendenciaResumo span,
+          .fichaPendenciaCampos span {
+            display: block;
+            color: #64748b;
+            font-size: 12px;
+          }
+
+          h3, h4, p {
+            margin-top: 0;
+          }
+
+          h3 {
+            margin-bottom: 0;
+            font-size: 20px;
+          }
+
+          .statusPendenciaChip {
+            display: inline-block;
+            padding: 6px 10px;
+            border: 1px solid #f59e0b;
+            border-radius: 999px;
+            font-weight: 700;
+          }
+
+          .fichaPendenciaResumo {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 16px 0 8px;
+          }
+
+          .fichaPendenciaResumo > div {
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+          }
+
+          .fichaPendenciaResumo strong {
+            display: block;
+            margin-top: 3px;
+            font-size: 17px;
+          }
+
+          .fichaPendenciaProgresso {
+            height: 8px;
+            margin-bottom: 18px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e5e7eb;
+          }
+
+          .fichaPendenciaProgresso span {
+            display: block;
+            height: 100%;
+            background: #16a34a;
+          }
+
+          .fichaPendenciaLista {
+            margin: 16px 0;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: #fff7ed;
+          }
+
+          .fichaPendenciaLista ul {
+            margin-bottom: 0;
+          }
+
+          .fichaPendenciaOrientacao {
+            margin: 16px 0;
+            padding: 12px 14px;
+            border-left: 4px solid #4f46e5;
+            background: #eef2ff;
+          }
+
+          .fichaPendenciaOrientacao p {
+            margin: 0;
+          }
+
+          .fichaPendenciaCampos {
+            display: grid;
+            gap: 18px;
+            margin-top: 22px;
+          }
+
+          .linhaPreenchimento {
+            margin-top: 6px;
+          }
+
+          .linhaAssinatura {
+            height: 26px;
+            border-bottom: 1px solid #111827;
+          }
+        </style>
+      </head>
+      <body>
+        ${conteudo.outerHTML}
+        <script>
+          window.onload = function () {
+            window.print();
+            window.onafterprint = function () {
+              window.close();
+            };
+          };
+        <\/script>
+      </body>
+    </html>
+  `);
+
+  janela.document.close();
 }
