@@ -55,7 +55,8 @@ function abrirAvaliacoesTurmaLegadoAvaliacoes(index) {
   salvarTurmasAvaliacoes(turmas);
 
   document.body.innerHTML =
-    ` <div class="cabecalhoTela"> <div> <h1>📝 Avaliações</h1> <p id="nomeTurmaAvaliacoes"></p> </div> </div> <main class="secaoApp"> <section class="card textoEsquerda"> <h2 id="tituloFormularioAvaliacao"> ➕ Nova avaliação </h2> <div class="grupoCampo"> <label for="bimestre"> Bimestre </label> <select id="bimestre"> <option value="1B"> 1º Bimestre </option> <option value="2B"> 2º Bimestre </option> <option value="3B"> 3º Bimestre </option> <option value="4B"> 4º Bimestre </option> </select> </div> <div class="grupoCampo"> <label for="nomeAvaliacao"> Nome da avaliação </label> <input id="nomeAvaliacao" type="text" placeholder="Ex.: Prova de Língua Portuguesa" autocomplete="off" > </div> <div class="grupoCampo"> <label for="tipoAvaliacao"> Tipo da avaliação </label> <select id="tipoAvaliacao"> <option value="atividade"> 📝 Atividade </option> <option value="trabalho"> 🎤 Trabalho </option> <option value="prova"> 📷 Prova </option> </select> </div> <div class="grupoCampo"> <label for="valorAvaliacao"> Valor da avaliação </label> <input id="valorAvaliacao" type="number" min="0.1" step="0.1" placeholder="Ex.: 10" inputmode="decimal" > </div> <div class="acoes"> <button id="criarAvaliacao" class="btnAzul" type="button" > <span class="material-icons-round"> add </span> Criar avaliação </button> </div> </section> <section class="painel"> <div class="painelBlocoCabecalho"> <div> <h2>📋 Avaliações cadastradas</h2> <p id="contadorAvaliacoes"> Nenhuma avaliação cadastrada. </p> </div> </div> <div id="listaAvaliacoes"></div> </section> <div class="acoes"> <button class="btnAzul" type="button" onclick="abrirDetalhesTurma(${index})" > <span class="material-icons-round"> arrow_back </span> Voltar para a turma </button> </div> </main> ` + barraInferior();
+    ` <div class="cabecalhoTela"> <div> <h1>📝 Avaliações</h1> <p id="nomeTurmaAvaliacoes"></p> </div> </div> <main class="secaoApp"> <section class="card textoEsquerda"> <h2 id="tituloFormularioAvaliacao"> ➕ Nova avaliação </h2> <div class="grupoCampo"> <label for="bimestre"> Bimestre </label> <select id="bimestre"> <option value="1B"> 1º Bimestre </option> <option value="2B"> 2º Bimestre </option> <option value="3B"> 3º Bimestre </option> <option value="4B"> 4º Bimestre </option> </select> </div> <div class="grupoCampo"> <label for="nomeAvaliacao"> Nome da avaliação </label> <input id="nomeAvaliacao" type="text" placeholder="Ex.: Prova de Língua Portuguesa" autocomplete="off" > </div> <div class="grupoCampo"> <label for="tipoAvaliacao"> Tipo da avaliação </label> <select id="tipoAvaliacao"> <option value="atividade"> 📝 Atividade </option> <option value="trabalho"> 🎤 Trabalho </option> <option value="prova"> 📷 Prova </option> </select> </div> <div class="grupoCampo"> <label for="valorAvaliacao"> Valor da avaliação </label> <input id="valorAvaliacao" type="number" min="0.1" step="0.1" placeholder="Ex.: 10" inputmode="decimal" > </div> <div class="acoes"> <button id="criarAvaliacao" class="btnAzul" type="button" > <span class="material-icons-round"> add </span> Criar avaliação </button> </div> </section> <section class="painel"> <div class="painelBlocoCabecalho"> <div> <h2>📋 Avaliações cadastradas</h2> <p id="contadorAvaliacoes"> Nenhuma avaliação cadastrada. </p> </div> </div> <div id="listaAvaliacoes"></div> </section> <div class="acoes"> <button class="btnAzul" type="button" onclick="abrirDetalhesTurma(${index})" > <span class="material-icons-round"> arrow_back </span> Voltar para a turma </button> </div> </main> ` +
+    barraInferior();
 
   aplicarTemaSalvo();
 
@@ -193,7 +194,7 @@ function renderizarAvaliacoes(index) {
         })
       : "0";
 
-    html += ` <div class="card textoEsquerda"> <div class="flexEntre"> <div> <h3> ${escaparHTML(avaliacao.nome || "Avaliação sem nome")} </h3> <p> ${nomeTipoAvaliacao(avaliacao.tipo)} </p> <p> 📅 ${nomeBimestre(avaliacao.bimestre)} </p> <p> ⭐ Valor: ${valorFormatado} </p> <p> 👨‍🎓 ${totalNotas} nota(s) lançada(s) • ${notasPendentes} pendente(s) </p> </div> </div> <div class="acoes"> <button type="button" class="btnAzul" onclick="abrirLancamentoNotas(${index},${i})" > <span class="material-icons-round"> grading </span> Lançar notas </button> ${ avaliacao.tipo === "atividade" ? ` <button type="button" onclick="abrirControleAtividades(${index},${i})" > <span class="material-icons-round"> fact_check </span> Controle de atividades </button> ` : "" } <button type="button" onclick="editarAvaliacao(${index},${i})" > <span class="material-icons-round"> edit </span> Editar </button> <button type="button" class="btnVermelho" onclick="excluirAvaliacao(${index},${i})" > <span class="material-icons-round"> delete </span> Excluir </button> </div> </div> `;
+    html += ` <div class="card textoEsquerda"> <div class="flexEntre"> <div> <h3> ${escaparHTML( avaliacao.nome || "Avaliação sem nome" )} </h3> <p> ${nomeTipoAvaliacao( avaliacao.tipo )} </p> <p> 📅 ${nomeBimestre( avaliacao.bimestre )} </p> <p> ⭐ Valor: ${valorFormatado} </p> <p> 👨‍🎓 ${totalNotas} nota(s) lançada(s) • ${notasPendentes} pendente(s) </p> </div> </div> <div class="acoes"> <button type="button" class="btnAzul" onclick="abrirLancamentoNotas(${index},${i})" > <span class="material-icons-round"> grading </span> Lançar notas </button> ${ avaliacao.tipo === "atividade" ? ` <button type="button" onclick="abrirControleAtividades(${index},${i})" > <span class="material-icons-round"> fact_check </span> Controle de atividades </button> ` : "" } <button type="button" onclick="editarAvaliacao(${index},${i})" > <span class="material-icons-round"> edit </span> Editar </button> <button type="button" class="btnVermelho" onclick="excluirAvaliacao(${index},${i})" > <span class="material-icons-round"> delete </span> Excluir </button> </div> </div> `;
   });
 
   lista.innerHTML = html;
@@ -872,21 +873,21 @@ function abrirLivroNotasLegadoAvaliacoes(indexTurma) {
       ? Math.round((totalNotasLancadas / totalNotasPossiveis) * 100)
       : 0;
 
-  let html = ` <div class="cabecalhoTela"> <div> <h1> 📚 Livro de Notas </h1> <p> ${escaparHTMLLivroNotas(turma.nome)} </p> </div> </div> <main class="secaoApp"> <section class="card textoEsquerda"> <div style=" display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; " > <div> <h2>📊 Visão geral</h2> <p> Acompanhe as avaliações e as médias provisórias da turma. </p> </div> <div class="acoes"> <button type="button" onclick="abrirAvaliacoesTurma(${indexTurma})" > <span class="material-icons-round"> assignment </span> Gerenciar avaliações </button> </div> </div> <div style=" display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-top:20px; " > <div class="card"> <strong> 👨‍🎓 Alunos </strong> <div style=" font-size:1.7rem; font-weight:800; margin-top:8px; " > ${turma.alunos.length} </div> </div> <div class="card"> <strong> 📝 Avaliações </strong> <div style=" font-size:1.7rem; font-weight:800; margin-top:8px; " > ${avaliacoesOrdenadas.length} </div> </div> <div class="card"> <strong> 📊 Média da turma </strong> <div style=" font-size:1.7rem; font-weight:800; margin-top:8px; " > ${mediaGeralTurma === null ? "—" : mediaGeralTurma.toFixed(1).replace(".", ",")} </div> </div> <div class="card"> <strong> ✅ Notas lançadas </strong> <div style=" font-size:1.7rem; font-weight:800; margin-top:8px; " > ${percentualPreenchimento}% </div> </div> </div> </section> `;
+  let html = ` <div class="cabecalhoTela"> <div> <h1> 📚 Livro de Notas </h1> <p> ${escaparHTMLLivroNotas( turma.nome )} </p> </div> </div> <main class="secaoApp"> <section class="card textoEsquerda"> <div style=" display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; " > <div> <h2>📊 Visão geral</h2> <p> Acompanhe as avaliações e as médias provisórias da turma. </p> </div> <div class="acoes"> <button type="button" onclick="abrirAvaliacoesTurma(${indexTurma})" > <span class="material-icons-round"> assignment </span> Gerenciar avaliações </button> </div> </div> <div style=" display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-top:20px; " > <div class="card"> <strong> 👨‍🎓 Alunos </strong> <div style=" font-size:1.7rem; font-weight:800; margin-top:8px; " > ${ turma.alunos.length } </div> </div> <div class="card"> <strong> 📝 Avaliações </strong> <div style=" font-size:1.7rem; font-weight:800; margin-top:8px; " > ${ avaliacoesOrdenadas.length } </div> </div> <div class="card"> <strong> 📊 Média da turma </strong> <div style=" font-size:1.7rem; font-weight:800; margin-top:8px; " > ${ mediaGeralTurma === null ? "—" : mediaGeralTurma.toFixed(1).replace(".", ",") } </div> </div> <div class="card"> <strong> ✅ Notas lançadas </strong> <div style=" font-size:1.7rem; font-weight:800; margin-top:8px; " > ${percentualPreenchimento}% </div> </div> </div> </section> `;
 
   if (turma.alunos.length === 0) {
     html += ` <section class="card"> ${criarMensagemVazia({ titulo: "Nenhum aluno cadastrado", descricao: "Cadastre os alunos desta turma para visualizar o Livro de Notas.", icone: "person_off", acao: criarBotao({ texto: "Cadastrar alunos", icone: "person_add", classe: "btnAzul", onclick: `abrirDetalhesTurma(${indexTurma})`, }), })} </section> `;
   } else if (avaliacoesOrdenadas.length === 0) {
     html += ` <section class="card"> ${criarMensagemVazia({ titulo: "Nenhuma avaliação cadastrada", descricao: "Crie uma avaliação para iniciar o Livro de Notas.", icone: "assignment_add", acao: criarBotao({ texto: "Criar avaliação", icone: "add_task", classe: "btnAzul", onclick: `abrirAvaliacoesTurma(${indexTurma})`, }), })} </section> `;
   } else {
-    html += ` <section class="painel"> <div class="painelBlocoCabecalho"> <div> <h2>📋 Notas da turma</h2> <p> Toque no nome de uma avaliação para lançar ou editar notas. </p> </div> </div> <div style=" width:100%; overflow-x:auto; padding-bottom:10px; " > <table style=" width:100%; min-width:${350 + avaliacoesOrdenadas.length * 135}px; border-collapse:separate; border-spacing:0; " > <thead> <tr> <th style=" position:sticky; left:0; z-index:3; background:var(--card); padding:14px; text-align:left; border-bottom:1px solid var(--borda); min-width:190px; " > Aluno </th> `;
+    html += ` <section class="painel"> <div class="painelBlocoCabecalho"> <div> <h2>📋 Notas da turma</h2> <p> Toque no nome de uma avaliação para lançar ou editar notas. </p> </div> </div> <div style=" width:100%; overflow-x:auto; padding-bottom:10px; " > <table style=" width:100%; min-width:${ 350 + avaliacoesOrdenadas.length * 135 }px; border-collapse:separate; border-spacing:0; " > <thead> <tr> <th style=" position:sticky; left:0; z-index:3; background:var(--card); padding:14px; text-align:left; border-bottom:1px solid var(--borda); min-width:190px; " > Aluno </th> `;
 
     avaliacoesOrdenadas.forEach((item) => {
       let avaliacao = item.avaliacao;
 
       let valorMaximo = obterNumeroLivroNotas(avaliacao.valor) || 0;
 
-      html += ` <th style=" padding:12px; text-align:center; border-bottom:1px solid var(--borda); min-width:125px; " > <button type="button" onclick="abrirLancamentoNotas(${indexTurma},${item.indexOriginal})" style=" border:none; background:transparent; color:var(--texto); padding:4px; font:inherit; cursor:pointer; width:100%; " > <strong> ${escaparHTMLLivroNotas(avaliacao.nome)} </strong> <small style=" display:block; margin-top:5px; opacity:.75; " > ${escaparHTMLLivroNotas(avaliacao.bimestre || "Sem bimestre")} <br> ${nomeTipoLivroNotas(avaliacao.tipo)} • ${valorMaximo} </small> </button> </th> `;
+      html += ` <th style=" padding:12px; text-align:center; border-bottom:1px solid var(--borda); min-width:125px; " > <button type="button" onclick="abrirLancamentoNotas(${indexTurma},${ item.indexOriginal })" style=" border:none; background:transparent; color:var(--texto); padding:4px; font:inherit; cursor:pointer; width:100%; " > <strong> ${escaparHTMLLivroNotas( avaliacao.nome )} </strong> <small style=" display:block; margin-top:5px; opacity:.75; " > ${escaparHTMLLivroNotas( avaliacao.bimestre || "Sem bimestre" )} <br> ${nomeTipoLivroNotas( avaliacao.tipo )} • ${valorMaximo} </small> </button> </th> `;
     });
 
     html += ` <th style=" padding:14px; text-align:center; border-bottom:1px solid var(--borda); min-width:100px; " > Média </th> <th style=" padding:14px; text-align:center; border-bottom:1px solid var(--borda); min-width:120px; " > Lançamentos </th> </tr> </thead> <tbody> `;
@@ -895,7 +896,7 @@ function abrirLivroNotasLegadoAvaliacoes(indexTurma) {
       let fundoLinha =
         indexAluno % 2 === 0 ? "transparent" : "rgba(127,127,127,.05)";
 
-      html += ` <tr style=" background:${fundoLinha}; " > <td style=" position:sticky; left:0; z-index:2; background:var(--card); padding:14px; border-bottom:1px solid var(--borda); font-weight:700; " > 👨‍🎓 ${escaparHTMLLivroNotas(resultado.aluno)} </td> `;
+      html += ` <tr style=" background:${fundoLinha}; " > <td style=" position:sticky; left:0; z-index:2; background:var(--card); padding:14px; border-bottom:1px solid var(--borda); font-weight:700; " > 👨‍🎓 ${escaparHTMLLivroNotas( resultado.aluno )} </td> `;
 
       avaliacoesOrdenadas.forEach((item) => {
         let avaliacao = item.avaliacao;
@@ -931,7 +932,7 @@ function abrirLivroNotasLegadoAvaliacoes(indexTurma) {
           }
         }
 
-        html += ` <td style=" padding:14px; text-align:center; border-bottom:1px solid var(--borda); " > ${ nota === null ? ` <span style="opacity:.55;"> — </span> ` : ` <strong> ${iconeNota} ${formatarNotaLivroNotas(nota)} </strong> <small style=" display:block; margin-top:4px; opacity:.65; " > de ${formatarNotaLivroNotas(valorMaximo)} </small> ` } </td> `;
+        html += ` <td style=" padding:14px; text-align:center; border-bottom:1px solid var(--borda); " > ${ nota === null ? ` <span style="opacity:.55;"> — </span> ` : ` <strong> ${iconeNota} ${formatarNotaLivroNotas( nota )} </strong> <small style=" display:block; margin-top:4px; opacity:.65; " > de ${formatarNotaLivroNotas( valorMaximo )} </small> ` } </td> `;
       });
 
       let corMedia = "";
@@ -946,10 +947,10 @@ function abrirLivroNotasLegadoAvaliacoes(indexTurma) {
         }
       }
 
-      html += ` <td style=" padding:14px; text-align:center; border-bottom:1px solid var(--borda); font-size:1.05rem; " > <strong> ${ resultado.mediaDez === null ? "—" : ` ${corMedia} ${resultado.mediaDez.toFixed(1).replace(".", ",")} ` } </strong> </td> <td style=" padding:14px; text-align:center; border-bottom:1px solid var(--borda); " > ${resultado.quantidadeNotas} de ${avaliacoesOrdenadas.length} </td> </tr> `;
+      html += ` <td style=" padding:14px; text-align:center; border-bottom:1px solid var(--borda); font-size:1.05rem; " > <strong> ${ resultado.mediaDez === null ? "—" : ` ${corMedia} ${resultado.mediaDez.toFixed(1).replace(".", ",")} ` } </strong> </td> <td style=" padding:14px; text-align:center; border-bottom:1px solid var(--borda); " > ${ resultado.quantidadeNotas } de ${avaliacoesOrdenadas.length} </td> </tr> `;
     });
 
-    html += ` </tbody> </table> </div> </section> <section class="card textoEsquerda"> <h2>📈 Resumo das médias</h2> <div style=" display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-top:18px; " > <div class="card"> <strong> 🏆 Maior média </strong> <p style=" font-size:1.5rem; font-weight:800; margin-bottom:0; " > ${ melhorMediaTurma === null ? "—" : melhorMediaTurma.toFixed(1).replace(".", ",") } </p> </div> <div class="card"> <strong> 📊 Média geral </strong> <p style=" font-size:1.5rem; font-weight:800; margin-bottom:0; " > ${mediaGeralTurma === null ? "—" : mediaGeralTurma.toFixed(1).replace(".", ",")} </p> </div> <div class="card"> <strong> ⚠️ Menor média </strong> <p style=" font-size:1.5rem; font-weight:800; margin-bottom:0; " > ${menorMediaTurma === null ? "—" : menorMediaTurma.toFixed(1).replace(".", ",")} </p> </div> </div> <p style=" margin-top:18px; opacity:.75; " > As médias são provisórias e calculadas proporcionalmente ao valor máximo de cada avaliação. </p> </section> `;
+    html += ` </tbody> </table> </div> </section> <section class="card textoEsquerda"> <h2>📈 Resumo das médias</h2> <div style=" display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-top:18px; " > <div class="card"> <strong> 🏆 Maior média </strong> <p style=" font-size:1.5rem; font-weight:800; margin-bottom:0; " > ${ melhorMediaTurma === null ? "—" : melhorMediaTurma.toFixed(1).replace(".", ",") } </p> </div> <div class="card"> <strong> 📊 Média geral </strong> <p style=" font-size:1.5rem; font-weight:800; margin-bottom:0; " > ${ mediaGeralTurma === null ? "—" : mediaGeralTurma.toFixed(1).replace(".", ",") } </p> </div> <div class="card"> <strong> ⚠️ Menor média </strong> <p style=" font-size:1.5rem; font-weight:800; margin-bottom:0; " > ${ menorMediaTurma === null ? "—" : menorMediaTurma.toFixed(1).replace(".", ",") } </p> </div> </div> <p style=" margin-top:18px; opacity:.75; " > As médias são provisórias e calculadas proporcionalmente ao valor máximo de cada avaliação. </p> </section> `;
   }
 
   html += ` <div class="acoes"> <button class="btnAzul" type="button" onclick="abrirDetalhesTurma(${indexTurma})" > <span class="material-icons-round"> arrow_back </span> Voltar para a turma </button> </div> </main> `;
@@ -1015,7 +1016,7 @@ function abrirLancamentoNotasLegadoAvaliacoes(indexTurma, indexAvaliacao) {
 
   let valorAvaliacao = parseFloat(avaliacao.valor) || 0;
 
-  let html = ` <div class="cabecalhoTela"> <div> <h1> 📋 ${escaparHTML(avaliacao.nome)} </h1> <p> ${nomeTipo(avaliacao.tipo)} • ${escaparHTML(avaliacao.bimestre)} • Valor máximo: ${valorAvaliacao} </p> </div> </div> <main class="secaoApp"> <section class="painel"> <div class="painelBlocoCabecalho"> <div> <h2>👨‍🎓 Notas dos alunos</h2> <p> Digite as notas e salve as alterações. </p> </div> </div> <div id="listaNotasTurma"> `;
+  let html = ` <div class="cabecalhoTela"> <div> <h1> 📋 ${escaparHTML( avaliacao.nome )} </h1> <p> ${nomeTipo(avaliacao.tipo)} • ${escaparHTML( avaliacao.bimestre )} • Valor máximo: ${valorAvaliacao} </p> </div> </div> <main class="secaoApp"> <section class="painel"> <div class="painelBlocoCabecalho"> <div> <h2>👨‍🎓 Notas dos alunos</h2> <p> Digite as notas e salve as alterações. </p> </div> </div> <div id="listaNotasTurma"> `;
 
   if (turma.alunos.length === 0) {
     html += criarMensagemVazia({
@@ -1034,7 +1035,7 @@ function abrirLancamentoNotasLegadoAvaliacoes(indexTurma, indexAvaliacao) {
 
       let notaAtual = possuiNota ? avaliacao.notas[aluno] : "";
 
-      html += ` <div class="card textoEsquerda"> <div class="grupoCampo"> <label for="notaAluno_${indexAluno}"> 👨‍🎓 ${escaparHTML(aluno)} </label> <input type="number" step="0.1" max="${valorAvaliacao}" min="0" value="${notaAtual}" id="notaAluno_${indexAluno}" data-index-aluno="${indexAluno}" placeholder="Nota de 0 a ${valorAvaliacao}" inputmode="decimal" > </div> </div> `;
+      html += ` <div class="card textoEsquerda"> <div class="grupoCampo"> <label for="notaAluno_${indexAluno}"> 👨‍🎓 ${escaparHTML( aluno )} </label> <input type="number" step="0.1" max="${valorAvaliacao}" min="0" value="${notaAtual}" id="notaAluno_${indexAluno}" data-index-aluno="${indexAluno}" placeholder="Nota de 0 a ${valorAvaliacao}" inputmode="decimal" > </div> </div> `;
     });
   }
 
@@ -1810,7 +1811,7 @@ function abrirControleAtividadesLegadoAvaliacoes(indexTurma, indexAvaliacao) {
 
   let nomeTurmaSeguro = escaparHTML(turma.nome || "Turma sem nome");
 
-  let html = ` <div class="cabecalhoTela"> <div> <h1> 📋 ${nomeAvaliacaoSeguro} </h1> <p> 📚 ${nomeTurmaSeguro} • ${quantidade} exercício(s) • Valor ${valorAvaliacao.toLocaleString("pt-BR", { maximumFractionDigits: 2, })} </p> </div> </div> <main class="secaoApp"> <section class="painel"> <div class="painelBlocoCabecalho"> <div> <h2>📊 Estatísticas da atividade</h2> <p> Acompanhe a realização dos exercícios e o desempenho dos alunos. </p> </div> </div> <div style=" display:grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap:15px; "> <div class="card"> <h2>👨‍🎓</h2> <h3>${totalAlunos}</h3> <p>Alunos</p> </div> <div class="card"> <h2>✅</h2> <h3>${concluidos}</h3> <p>Concluíram</p> </div> <div class="card"> <h2>🟡</h2> <h3>${emAndamento}</h3> <p>Em andamento</p> </div> <div class="card"> <h2>🔴</h2> <h3>${naoIniciaram}</h3> <p>Não iniciaram</p> </div> <div class="card"> <h2>📈</h2> <h3> ${mediaAtividade.toFixed(1)} </h3> <p>Média da turma</p> </div> </div> <div class="card textoEsquerda"> <label for="buscaAlunoAtividade"> <strong> 🔍 Pesquisar aluno </strong> </label> <input id="buscaAlunoAtividade" type="search" placeholder="Digite o nome do aluno..." autocomplete="off" > </div> <div class="card textoEsquerda"> <label for="ordenacaoAtividade"> <strong> 📋 Ordenar por </strong> </label> <select id="ordenacaoAtividade"> <option value="nome" ${ordenacaoAtual === "nome" ? "selected" : ""} > Nome </option> <option value="nota" ${ordenacaoAtual === "nota" ? "selected" : ""} > Maior nota </option> <option value="percentual" ${ordenacaoAtual === "percentual" ? "selected" : ""} > Maior conclusão </option> <option value="pendencias" ${ordenacaoAtual === "pendencias" ? "selected" : ""} > Mais pendências </option> </select> </div> <div class="card textoEsquerda"> <div style=" width:100%; height:18px; background:var(--borda); border-radius:999px; overflow:hidden; "> <div style=" width:${percentualConclusao}%; height:100%; background:var(--sucesso); transition:width .3s ease; "> </div> </div> <p> <strong> ${percentualConclusao}% dos alunos concluíram todos os exercícios. </strong> </p> </div> </section> <section class="card textoEsquerda"> <h2>🏆 Ranking da atividade</h2> `;
+  let html = ` <div class="cabecalhoTela"> <div> <h1> 📋 ${nomeAvaliacaoSeguro} </h1> <p> 📚 ${nomeTurmaSeguro} • ${quantidade} exercício(s) • Valor ${valorAvaliacao.toLocaleString( "pt-BR", { maximumFractionDigits: 2 } )} </p> </div> </div> <main class="secaoApp"> <section class="painel"> <div class="painelBlocoCabecalho"> <div> <h2>📊 Estatísticas da atividade</h2> <p> Acompanhe a realização dos exercícios e o desempenho dos alunos. </p> </div> </div> <div style=" display:grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap:15px; "> <div class="card"> <h2>👨‍🎓</h2> <h3>${totalAlunos}</h3> <p>Alunos</p> </div> <div class="card"> <h2>✅</h2> <h3>${concluidos}</h3> <p>Concluíram</p> </div> <div class="card"> <h2>🟡</h2> <h3>${emAndamento}</h3> <p>Em andamento</p> </div> <div class="card"> <h2>🔴</h2> <h3>${naoIniciaram}</h3> <p>Não iniciaram</p> </div> <div class="card"> <h2>📈</h2> <h3> ${mediaAtividade.toFixed( 1 )} </h3> <p>Média da turma</p> </div> </div> <div class="card textoEsquerda"> <label for="buscaAlunoAtividade"> <strong> 🔍 Pesquisar aluno </strong> </label> <input id="buscaAlunoAtividade" type="search" placeholder="Digite o nome do aluno..." autocomplete="off" > </div> <div class="card textoEsquerda"> <label for="ordenacaoAtividade"> <strong> 📋 Ordenar por </strong> </label> <select id="ordenacaoAtividade"> <option value="nome" ${ ordenacaoAtual === "nome" ? "selected" : "" } > Nome </option> <option value="nota" ${ ordenacaoAtual === "nota" ? "selected" : "" } > Maior nota </option> <option value="percentual" ${ ordenacaoAtual === "percentual" ? "selected" : "" } > Maior conclusão </option> <option value="pendencias" ${ ordenacaoAtual === "pendencias" ? "selected" : "" } > Mais pendências </option> </select> </div> <div class="card textoEsquerda"> <div style=" width:100%; height:18px; background:var(--borda); border-radius:999px; overflow:hidden; "> <div style=" width:${percentualConclusao}%; height:100%; background:var(--sucesso); transition:width .3s ease; "> </div> </div> <p> <strong> ${percentualConclusao}% dos alunos concluíram todos os exercícios. </strong> </p> </div> </section> <section class="card textoEsquerda"> <h2>🏆 Ranking da atividade</h2> `;
 
   if (ranking.length === 0) {
     html += criarMensagemVazia({
@@ -1834,7 +1835,7 @@ function abrirControleAtividadesLegadoAvaliacoes(indexTurma, indexAvaliacao) {
           ? "🥉"
           : posicao + 1 + "º";
 
-      html += ` <tr> <td> ${medalha} </td> <td> ${escaparHTML(aluno.nome)} </td> <td> ${aluno.feitos}/${quantidade} </td> <td> ${aluno.nota.toFixed(1)} </td> </tr> `;
+      html += ` <tr> <td> ${medalha} </td> <td> ${escaparHTML( aluno.nome )} </td> <td> ${ aluno.feitos }/${quantidade} </td> <td> ${aluno.nota.toFixed(1)} </td> </tr> `;
     });
 
     html += ` </tbody> </table> </div> `;
@@ -1845,7 +1846,7 @@ function abrirControleAtividadesLegadoAvaliacoes(indexTurma, indexAvaliacao) {
   for (let numero = 1; numero <= quantidade; numero++) {
     let exercicio = avaliacao.controleAtividades.exercicios[numero] || {};
 
-    html += ` <th class="colExercicio"> <button type="button" class="btnExercicio editarExercicioAtividade" data-exercicio="${numero}" aria-label="Editar exercício ${numero}" > <div class="numeroExercicio"> 📘 ${numero} </div> <div class="nomeExercicio"> ${escaparHTML(exercicio.nome || "Clique para editar")} </div> <div class="dataExercicio"> ${escaparHTML(exercicio.data || "")} </div> </button> </th> `;
+    html += ` <th class="colExercicio"> <button type="button" class="btnExercicio editarExercicioAtividade" data-exercicio="${numero}" aria-label="Editar exercício ${numero}" > <div class="numeroExercicio"> 📘 ${numero} </div> <div class="nomeExercicio"> ${escaparHTML( exercicio.nome || "Clique para editar" )} </div> <div class="dataExercicio"> ${escaparHTML( exercicio.data || "" )} </div> </button> </th> `;
   }
 
   html += ` <th class="colResumo"> % </th> <th class="colResumo"> Nota </th> </tr> </thead> <tbody id="corpoTabelaAtividades"> `;
@@ -1874,19 +1875,19 @@ function abrirControleAtividadesLegadoAvaliacoes(indexTurma, indexAvaliacao) {
       nota = 0;
     }
 
-    html += ` <tr class="linhaAlunoAtividade ${classeLinha}" data-index-aluno="${indexAlunoOrdenado}" data-aluno="${escaparHTML(normalizarBusca(aluno))}" > <td class="nomeAlunoTabela abrirPainelAlunoAtividadeBotao" data-index-aluno="${indexAlunoOrdenado}" tabindex="0" role="button" aria-label="Abrir painel de ${escaparHTML(aluno)}" > ${escaparHTML(aluno)} </td> `;
+    html += ` <tr class="linhaAlunoAtividade ${classeLinha}" data-index-aluno="${indexAlunoOrdenado}" data-aluno="${escaparHTML( normalizarBusca(aluno) )}" > <td class="nomeAlunoTabela abrirPainelAlunoAtividadeBotao" data-index-aluno="${indexAlunoOrdenado}" tabindex="0" role="button" aria-label="Abrir painel de ${escaparHTML( aluno )}" > ${escaparHTML(aluno)} </td> `;
 
     for (let numero = 1; numero <= quantidade; numero++) {
       let feito = registrosAluno[numero] === true;
 
-      html += ` <td class="${feito ? "celulaFeita" : "celulaPendente"} alternarAtividadeCelula" data-index-aluno="${indexAlunoOrdenado}" data-exercicio="${numero}" tabindex="0" role="button" aria-label="${ feito ? "Desmarcar" : "Marcar" } exercício ${numero} de ${escaparHTML(aluno)}" > ${feito ? "+" : ""} </td> `;
+      html += ` <td class="${ feito ? "celulaFeita" : "celulaPendente" } alternarAtividadeCelula" data-index-aluno="${indexAlunoOrdenado}" data-exercicio="${numero}" tabindex="0" role="button" aria-label="${ feito ? "Desmarcar" : "Marcar" } exercício ${numero} de ${escaparHTML(aluno)}" > ${ feito ? "+" : "" } </td> `;
     }
 
-    html += ` <td class="resumoTabela"> ${percentual}% </td> <td class="resumoTabela"> ${nota.toFixed(1)} </td> </tr> `;
+    html += ` <td class="resumoTabela"> ${percentual}% </td> <td class="resumoTabela"> ${nota.toFixed( 1 )} </td> </tr> `;
   });
 
   if (alunosOrdenados.length === 0) {
-    html += ` <tr> <td colspan="${quantidade + 3}" style=" padding:30px; text-align:center; " > Nenhum aluno cadastrado nesta turma. </td> </tr> `;
+    html += ` <tr> <td colspan="${ quantidade + 3 }" style=" padding:30px; text-align:center; " > Nenhum aluno cadastrado nesta turma. </td> </tr> `;
   }
 
   html += ` </tbody> </table> </div> </section> <div class="acoes"> <button class="btnAzul" type="button" onclick="abrirListaAtividadesControle(${indexTurma})" > <span class="material-icons-round"> arrow_back </span> Voltar </button> </div> </main> `;
@@ -2073,7 +2074,8 @@ function abrirBoletimBimestralTurmaLegadoAvaliacoes(indexTurma) {
   let turma = turmas[indexTurma];
 
   document.body.innerHTML =
-    ` <h1>📊 Boletim Bimestral</h1> <h2>📚 ${turma.nome}</h2> <select id="bimestreBoletim"> <option value="1B">1º Bimestre</option> <option value="2B">2º Bimestre</option> <option value="3B">3º Bimestre</option> <option value="4B">4º Bimestre</option> </select> <br><br> <div id="resultadoBoletimBimestral"></div> <button onclick="window.print()"> 📄 Imprimir / Salvar PDF </button> <button onclick="abrirDetalhesTurma(${indexTurma})"> ⬅ Voltar </button> ` + barraInferior();
+    ` <h1>📊 Boletim Bimestral</h1> <h2>📚 ${turma.nome}</h2> <select id="bimestreBoletim"> <option value="1B">1º Bimestre</option> <option value="2B">2º Bimestre</option> <option value="3B">3º Bimestre</option> <option value="4B">4º Bimestre</option> </select> <br><br> <div id="resultadoBoletimBimestral"></div> <button onclick="window.print()"> 📄 Imprimir / Salvar PDF </button> <button onclick="abrirDetalhesTurma(${indexTurma})"> ⬅ Voltar </button> ` +
+    barraInferior();
 
   aplicarTemaSalvo();
 
@@ -2137,10 +2139,12 @@ function abrirBoletimBimestralTurmaLegadoAvaliacoes(indexTurma) {
         abaixo++;
       }
 
-      linhas += ` <tr style="border-left:6px solid ${cor};"> <td> <button onclick="abrirPainelAluno(${indexTurma},'${aluno}')" style=" border:none; background:none; font-weight:bold; cursor:pointer; color:#2563EB; " > ${aluno} </button> </td> ${colunasNotas} <td><strong>${totalAluno.toFixed(1)}</strong></td> <td><strong>${media.toFixed(1)}</strong></td> <td><strong>${situacao}</strong></td> </tr> `;
+      linhas += ` <tr style="border-left:6px solid ${cor};"> <td> <button onclick="abrirPainelAluno(${indexTurma},'${aluno}')" style=" border:none; background:none; font-weight:bold; cursor:pointer; color:#2563EB; " > ${aluno} </button> </td> ${colunasNotas} <td><strong>${totalAluno.toFixed( 1 )}</strong></td> <td><strong>${media.toFixed( 1 )}</strong></td> <td><strong>${situacao}</strong></td> </tr> `;
     });
 
-    document.getElementById("resultadoBoletimBimestral").innerHTML = ` <div style="overflow:auto;"> <table border="1" style=" border-collapse:collapse; width:100%; background:white; color:#111827; text-align:center; font-size:13px; "> <tr style=" background:#4A6CF7; color:white; "> <th>Aluno</th> ${cabecalho} <th>Total</th> <th>Média</th> <th>Situação</th> </tr> ${ linhas || ` <tr> <td colspan="5"> Nenhuma avaliação cadastrada neste bimestre. </td> </tr> ` } </table> </div> <br> <div class="card"> <strong>Valor total do bimestre:</strong> ${valorTotal.toFixed(1)} <br><br> <strong>Média da turma:</strong> ${ mediasTurma.length > 0 ? (mediasTurma.reduce((a, b) => a + b, 0) / mediasTurma.length).toFixed(1) : "0.0" } <br> <strong>Maior média:</strong> ${mediasTurma.length > 0 ? Math.max(...mediasTurma).toFixed(1) : "0.0"} <br> <strong>Menor média:</strong> ${mediasTurma.length > 0 ? Math.min(...mediasTurma).toFixed(1) : "0.0"} <br><br> 🟢 Aprovados: ${aprovados} <br> 🟡 Recuperação: ${recuperacao} <br> 🔴 Abaixo: ${abaixo} </div> `;
+    document.getElementById(
+      "resultadoBoletimBimestral"
+    ).innerHTML = ` <div style="overflow:auto;"> <table border="1" style=" border-collapse:collapse; width:100%; background:white; color:#111827; text-align:center; font-size:13px; "> <tr style=" background:#4A6CF7; color:white; "> <th>Aluno</th> ${cabecalho} <th>Total</th> <th>Média</th> <th>Situação</th> </tr> ${ linhas || ` <tr> <td colspan="5"> Nenhuma avaliação cadastrada neste bimestre. </td> </tr> ` } </table> </div> <br> <div class="card"> <strong>Valor total do bimestre:</strong> ${valorTotal.toFixed( 1 )} <br><br> <strong>Média da turma:</strong> ${ mediasTurma.length > 0 ? (mediasTurma.reduce((a, b) => a + b, 0) / mediasTurma.length).toFixed( 1 ) : "0.0" } <br> <strong>Maior média:</strong> ${ mediasTurma.length > 0 ? Math.max(...mediasTurma).toFixed(1) : "0.0" } <br> <strong>Menor média:</strong> ${ mediasTurma.length > 0 ? Math.min(...mediasTurma).toFixed(1) : "0.0" } <br><br> 🟢 Aprovados: ${aprovados} <br> 🟡 Recuperação: ${recuperacao} <br> 🔴 Abaixo: ${abaixo} </div> `;
 
     salvarTurmasAvaliacoes(turmas);
   }
@@ -2608,7 +2612,9 @@ function imprimirFichaAlunoPendencia(botao) {
 
   let conteudo = ficha.innerHTML;
 
-  janela.document.write(` <!DOCTYPE html> <html lang="pt-BR"> <head> <meta charset="UTF-8"> <title>Ficha de Pendência</title> <style> body{ font-family:Arial,sans-serif; padding:30px; color:#111827; line-height:1.5; } button{ display:none; } </style> </head> <body> ${conteudo} <script> window.onload=function(){ window.print(); window.onafterprint=function(){ window.close(); }; }; </script> </body> </html> `);
+  janela.document.write(
+    ` <!DOCTYPE html> <html lang="pt-BR"> <head> <meta charset="UTF-8"> <title>Ficha de Pendência</title> <style> body{ font-family:Arial,sans-serif; padding:30px; color:#111827; line-height:1.5; } button{ display:none; } </style> </head> <body> ${conteudo} <script> window.onload=function(){ window.print(); window.onafterprint=function(){ window.close(); }; }; </script> </body> </html> `
+  );
 
   janela.document.close();
 }
@@ -2750,7 +2756,8 @@ function abrirPainelAlunoAtividade(indexTurma, indexAvaliacao, nomeAluno) {
   }
 
   document.body.innerHTML =
-    ` <h1>👨‍🎓 Painel do Aluno</h1> <div class="card" style="text-align:left;" > <h2>${nomeAlunoSeguro}</h2> <p> 📚 Turma: ${nomeTurmaSeguro} </p> <p> 📋 Atividade: ${nomeAvaliacaoSeguro} </p> <hr> <p> 📊 Nota: <strong> ${nota.toFixed(1)} / ${valor} </strong> </p> <p> 📈 Conclusão: <strong>${percentual}%</strong> </p> <p> ✅ Feitos: ${feitos} </p> <p> 🚨 Pendentes: ${pendentes} </p> </div> <div class="card" style="text-align:left;" > <h3>✅ Exercícios feitos</h3> <ul> ${listaFeitos || "<li>Nenhum exercício feito.</li>"} </ul> </div> <div class="card" style="text-align:left;" > <h3>🚨 Exercícios pendentes</h3> <ul> ${listaPendentes || "<li>Nenhuma pendência.</li>"} </ul> </div> <button type="button" onclick="window.print()" > 🖨 Imprimir ficha </button> <button type="button" onclick="abrirControleAtividades(${indexTurma},${indexAvaliacao})" > ⬅ Voltar </button> ` + barraInferior();
+    ` <h1>👨‍🎓 Painel do Aluno</h1> <div class="card" style="text-align:left;" > <h2>${nomeAlunoSeguro}</h2> <p> 📚 Turma: ${nomeTurmaSeguro} </p> <p> 📋 Atividade: ${nomeAvaliacaoSeguro} </p> <hr> <p> 📊 Nota: <strong> ${nota.toFixed( 1 )} / ${valor} </strong> </p> <p> 📈 Conclusão: <strong>${percentual}%</strong> </p> <p> ✅ Feitos: ${feitos} </p> <p> 🚨 Pendentes: ${pendentes} </p> </div> <div class="card" style="text-align:left;" > <h3>✅ Exercícios feitos</h3> <ul> ${ listaFeitos || "<li>Nenhum exercício feito.</li>" } </ul> </div> <div class="card" style="text-align:left;" > <h3>🚨 Exercícios pendentes</h3> <ul> ${ listaPendentes || "<li>Nenhuma pendência.</li>" } </ul> </div> <button type="button" onclick="window.print()" > 🖨 Imprimir ficha </button> <button type="button" onclick="abrirControleAtividades(${indexTurma},${indexAvaliacao})" > ⬅ Voltar </button> ` +
+    barraInferior();
 
   aplicarTemaSalvo();
 }
@@ -2805,7 +2812,7 @@ function abrirPainelAluno(indexTurma, nomeAluno) {
       totalAluno += nota;
       valorTotal += valor;
 
-      detalhes += ` <p> <strong>${av.nome}</strong> <br> ${av.tipo} — ${nota.toFixed(1)} / ${valor.toFixed(1)} </p> `;
+      detalhes += ` <p> <strong>${av.nome}</strong> <br> ${ av.tipo } — ${nota.toFixed(1)} / ${valor.toFixed(1)} </p> `;
     });
 
     let mediaBim = valorTotal > 0 ? (totalAluno / valorTotal) * 10 : 0;
@@ -2826,7 +2833,7 @@ function abrirPainelAluno(indexTurma, nomeAluno) {
       }
     }
 
-    html += ` <div class="card" style="text-align:left;"> <h3>${bim.replace("B", "º Bimestre")}</h3> <p><strong>Total:</strong> ${totalAluno.toFixed(1)} / ${valorTotal.toFixed( 1 )}</p> <p><strong>Média:</strong> ${mediaBim.toFixed(1)}</p> <p><strong>Situação:</strong> ${situacao}</p> <hr> ${detalhes || "<p>Nenhuma avaliação cadastrada.</p>"} </div> `;
+    html += ` <div class="card" style="text-align:left;"> <h3>${bim.replace( "B", "º Bimestre" )}</h3> <p><strong>Total:</strong> ${totalAluno.toFixed( 1 )} / ${valorTotal.toFixed( 1 )}</p> <p><strong>Média:</strong> ${mediaBim.toFixed( 1 )}</p> <p><strong>Situação:</strong> ${situacao}</p> <hr> ${ detalhes || "<p>Nenhuma avaliação cadastrada.</p>" } </div> `;
   });
 
   let mediaAnual =
@@ -2834,7 +2841,7 @@ function abrirPainelAluno(indexTurma, nomeAluno) {
       ? mediasAnuais.reduce((a, b) => a + b, 0) / mediasAnuais.length
       : 0;
 
-  html += ` <div class="card"> <h3>📊 Resumo Anual</h3> <p><strong>Média anual atual:</strong> ${mediaAnual.toFixed(1)}</p> <p><strong>Bimestres com nota:</strong> ${mediasAnuais.length}</p> </div> <button onclick="window.print()"> 📄 Imprimir Relatório </button> <br><br> <button onclick="abrirBoletimBimestralTurma(${indexTurma})"> ⬅ Voltar </button> `;
+  html += ` <div class="card"> <h3>📊 Resumo Anual</h3> <p><strong>Média anual atual:</strong> ${mediaAnual.toFixed( 1 )}</p> <p><strong>Bimestres com nota:</strong> ${ mediasAnuais.length }</p> </div> <button onclick="window.print()"> 📄 Imprimir Relatório </button> <br><br> <button onclick="abrirBoletimBimestralTurma(${indexTurma})"> ⬅ Voltar </button> `;
 
   document.body.innerHTML = html + barraInferior();
 
